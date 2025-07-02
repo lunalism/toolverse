@@ -5,6 +5,8 @@ import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FileImage, XIcon } from 'lucide-react'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { DndContext, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -13,6 +15,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import jsPDF from 'jspdf'
 
 interface UploadedImage {
   id: string
@@ -55,6 +58,8 @@ function SortableImage({ image, onRemove }: { image: UploadedImage; onRemove: ()
 export default function ImageToPdfPage() {
   const [images, setImages] = useState<UploadedImage[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [filename, setFilename] = useState('converted')
+  const [isConverting, setIsConverting] = useState(false)
   const sensors = useSensors(useSensor(PointerSensor))
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -92,10 +97,35 @@ export default function ImageToPdfPage() {
 
   const activeImage = images.find((img) => img.id === activeId)
 
+  const handleConvertToPdf = async () => {
+    if (images.length === 0) return
+    setIsConverting(true)
+    const pdf = new jsPDF()
+
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i]
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.readAsDataURL(img.file)
+      })
+
+      const imgProps = pdf.getImageProperties(dataUrl)
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+
+      if (i > 0) pdf.addPage()
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight)
+    }
+
+    pdf.save(`${filename || 'converted'}.pdf`)
+    setIsConverting(false)
+  }
+
   return (
     <main className="max-w-screen-md mx-auto px-4 py-20">
       <h1 className="text-2xl font-bold mb-2">🖼️ 이미지 → PDF 변환기</h1>
-      <p className="text-gray-600 mb-6">이미지를 업로드하여 하나의 PDF 파일로 변환하세요. 순서 변경도 가능합니다.</p>
+      <p className="text-gray-600 mb-6">JPEG, PNG, WebP, GIF, BMP, TIFF 등 다양한 이미지 포맷 간 변환을 브라우저에서 직접 수행하세요.</p>
 
       <div
         {...getRootProps()}
@@ -115,6 +145,18 @@ export default function ImageToPdfPage() {
       {images.length > 0 && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-4">업로드된 이미지 ({images.length})</h2>
+
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700 dark:text-gray-300">PDF 파일 이름</span>
+            <Input
+              type="text"
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              className="mt-1"
+              placeholder="converted"
+            />
+          </label>
+
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -140,6 +182,10 @@ export default function ImageToPdfPage() {
               ) : null}
             </DragOverlay>
           </DndContext>
+
+          <Button onClick={handleConvertToPdf} className="mt-6" disabled={isConverting}>
+            {isConverting ? '변환 중...' : 'PDF로 저장'}
+          </Button>
         </section>
       )}
     </main>
