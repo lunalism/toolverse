@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { MoonIcon, SunIcon, ChevronDown, ChevronRight } from 'lucide-react'
 import { useState, useRef } from 'react'
 import Link from 'next/link'
+import { LanguageSelector } from '@/components/layout/LanguageSelector'
 
 const MENU = [
     {
@@ -149,11 +150,13 @@ export default function Header() {
                         onClick={toggleTheme}
                         />
                     )}
-                    <select className="bg-transparent outline-none cursor-pointer">
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                    </select>
+                    <LanguageSelector
+                        current="ko"
+                        onSelect={(lang) => {
+                            // TODO: 언어 변경 처리
+                            console.log('언어 변경됨:', lang)
+                        }}
+                    />
                 </div>
             </div>
         </header>
