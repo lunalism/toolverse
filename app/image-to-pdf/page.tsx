@@ -16,6 +16,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import jsPDF from 'jspdf'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 interface UploadedImage {
   id: string
@@ -60,6 +61,8 @@ export default function ImageToPdfPage() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [filename, setFilename] = useState('converted')
   const [isConverting, setIsConverting] = useState(false)
+  const [pageSize, setPageSize] = useState<'auto' | 'A4' | 'Letter'>('auto')
+
   const sensors = useSensors(useSensor(PointerSensor))
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -100,7 +103,9 @@ export default function ImageToPdfPage() {
   const handleConvertToPdf = async () => {
     if (images.length === 0) return
     setIsConverting(true)
-    const pdf = new jsPDF()
+    const pdf = new jsPDF({
+      format: pageSize === 'A4' ? 'a4' : pageSize === 'Letter' ? 'letter' : undefined
+    })
 
     for (let i = 0; i < images.length; i++) {
       const img = images[i]
@@ -146,16 +151,39 @@ export default function ImageToPdfPage() {
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-4">업로드된 이미지 ({images.length})</h2>
 
-          <label className="block mb-4">
-            <span className="text-sm text-gray-700 dark:text-gray-300">PDF 파일 이름</span>
-            <Input
-              type="text"
-              value={filename}
-              onChange={(e) => setFilename(e.target.value)}
-              className="mt-1"
-              placeholder="converted"
-            />
-          </label>
+          <div className="flex flex-col gap-1 mb-4">
+            <div className="flex gap-4">
+              <div className="w-4/5">
+                <label htmlFor="filename" className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  PDF 파일 이름
+                </label>
+                <Input
+                  id="filename"
+                  type="text"
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                  placeholder="converted"
+                />
+              </div>
+              <div className="w-1/5">
+                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  PDF 페이지 크기
+                </label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      {pageSize === 'auto' ? '이미지에 맞게 자동' : pageSize}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={() => setPageSize('auto')}>이미지에 맞게 자동</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setPageSize('A4')}>A4</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setPageSize('Letter')}>Letter</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </div>
 
           <DndContext
             sensors={sensors}
