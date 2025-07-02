@@ -6,6 +6,7 @@ import { MoonIcon, SunIcon, ChevronDown, ChevronRight } from 'lucide-react'
 import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { LanguageSelector } from '@/components/layout/LanguageSelector'
+import { MainMenu } from '@/components/layout/MainMenu'
 
 const MENU = [
     {
@@ -83,59 +84,7 @@ export default function Header() {
                 </div>
 
                 {/* 중앙 메뉴 */}
-                <nav className="hidden md:flex space-x-6 text-sm font-medium">
-                    {MENU.map(({ label, items, badge }) => {
-                        const isOpen = activeMenu === label
-                        return (
-                        <div key={label} className="relative">
-                            {/* 대분류 메뉴 */}
-                            <div
-                            className="flex items-center space-x-1 hover:text-black dark:hover:text-gray-200 transition cursor-pointer py-2"
-                            onMouseEnter={() => handleMouseEnter(label)}
-                            onMouseLeave={handleMouseLeave}
-                            >
-                                <span>{label}</span>
-                                {badge && (
-                                    <span className="text-[10px] font-bold text-red-500 ml-1">{badge}</span>
-                                )}
-                                {isOpen ? (
-                                    <ChevronDown className="w-4 h-4" />
-                                ) : (
-                                    <ChevronRight className="w-4 h-4" />
-                                )}
-                            </div>
-
-                            {/* 드롭다운 메뉴 */}
-                            {isOpen && (
-                                <div className="absolute top-full left-0 pt-2">
-                                    {/* 삼각형 화살표 */}
-                                    <div className="absolute top-2 left-4 w-3 h-3 bg-white dark:bg-gray-900 rotate-45 border-l border-t border-gray-200 dark:border-gray-700 z-20"></div>
-
-                                    {/* 드롭다운 콘텐츠 */}
-                                    <div
-                                    className={`bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 rounded-md min-w-[180px] z-10 overflow-hidden mt-2
-                                                transition-all duration-200 ease-out
-                                                ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
-                                    onMouseEnter={() => handleMouseEnter(label)}
-                                    onMouseLeave={handleMouseLeave}
-                                    >
-                                        {items.map(({ label: itemLabel, href }) => (
-                                            <Link
-                                            key={itemLabel}
-                                            href={href}
-                                            className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm whitespace-nowrap transition-colors"
-                                            onClick={() => setActiveMenu(null)}
-                                            >
-                                                {itemLabel}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        )
-                    })}
-                </nav>
+                <MainMenu />
 
                 {/* 오른쪽 기능 */}
                 <div className="flex items-center space-x-4 text-gray-500 dark:text-gray-400 text-sm">
