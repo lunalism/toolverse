@@ -53,35 +53,19 @@ const MENU = [
 ]
 
 export default function Header() {
-    const [activeMenu, setActiveMenu] = useState<string | null>(null)
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
     const { theme, setTheme } = useTheme()
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark')
     }
 
-    const handleMouseEnter = (label: string) => {
-        if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
-        }
-        setActiveMenu(label)
-    }
-
-    const handleMouseLeave = () => {
-        timeoutRef.current = setTimeout(() => {
-        setActiveMenu(null)
-        }, 200)
-    }
-
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 text-gray-800 dark:text-white">
             <div className="max-w-screen-xl mx-auto px-6 py-5 flex items-center justify-between">
                 {/* 로고 */}
-                <div className="flex items-center">
+                <Link href="/" className="flex items-center">
                     <Image src="/logo.png" alt="Toolverse Logo" width={120} height={36} />
-                </div>
+                </Link>
 
                 {/* 중앙 메뉴 */}
                 <MainMenu />
