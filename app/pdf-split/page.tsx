@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone'
 import { FilePlus, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { toast } from 'sonner'
 import { PDFDocument } from 'pdf-lib'
 import JSZip from 'jszip'
@@ -13,6 +14,8 @@ export default function PdfSplitPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [isSplitting, setIsSplitting] = useState(false)
   const [splitFiles, setSplitFiles] = useState<{ name: string; blob: Blob }[]>([])
+  const [splitMode, setSplitMode] = useState<'all' | 'range'>('all')
+  const [range, setRange] = useState('')
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -27,6 +30,21 @@ export default function PdfSplitPage() {
     multiple: false,
   })
 
+  const parsePageRange = (range: string, max: number): number[] => {
+    const pages = new Set<number>()
+    const parts = range.split(',')
+    for (const part of parts) {
+      if (part.includes('-')) {
+        const [start, end] = part.split('-').map(Number)
+        for (let i = start; i <= Math.min(end, max); i++) pages.add(i - 1)
+      } else {
+        const page = Number(part)
+        if (page >= 1 && page <= max) pages.add(page - 1)
+      }
+    }
+    return [...pages].sort((a, b) => a - b)
+  }
+
   const handleSplitAll = async () => {
     if (!pdfFile) return
     setIsSplitting(true)
@@ -36,7 +54,9 @@ export default function PdfSplitPage() {
       const totalPages = originalPdf.getPageCount()
       const results: { name: string; blob: Blob }[] = []
 
-      for (let i = 0; i < totalPages; i++) {
+      const pagesToExtract = splitMode === 'range' ? parsePageRange(range, totalPages) : Array.from({ length: totalPages }, (_, i) => i)
+
+      for (const i of pagesToExtract) {
         const newPdf = await PDFDocument.create()
         const [copiedPage] = await newPdf.copyPages(originalPdf, [i])
         newPdf.addPage(copiedPage)
@@ -96,8 +116,34 @@ export default function PdfSplitPage() {
             </Button>
           </div>
 
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">분할 방식 선택</label>
+            <RadioGroup defaultValue="all" className="flex space-x-6" onValueChange={(val) => setSplitMode(val as 'all' | 'range')}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="all" id="mode-all" />
+                <label htmlFor="mode-all" className="text-sm">전체 분할</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="range" id="mode-range" />
+                <label htmlFor="mode-range" className="text-sm">부분 분할</label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {splitMode === 'range' && (
+            <div className="mb-4">
+              <label htmlFor="range" className="block text-sm font-medium text-gray-700 mb-1">페이지 범위 입력</label>
+              <Input
+                id="range"
+                placeholder="예: 1,3-5,8"
+                value={range}
+                onChange={(e) => setRange(e.target.value)}
+              />
+            </div>
+          )}
+
           <Button onClick={handleSplitAll} disabled={isSplitting} className="mb-6">
-            {isSplitting ? '분할 중...' : '전체 페이지로 분할하기'}
+            {isSplitting ? '분할 중...' : (splitMode === 'all' ? '전체 페이지로 분할하기' : '선택한 범위로 분할하기')}
           </Button>
 
           {splitFiles.length > 0 && (
