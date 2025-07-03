@@ -1,12 +1,14 @@
 // app/image-to-pdf/page.tsx
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FileImage, XIcon } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { toast } from 'sonner'
 import { DndContext, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -61,7 +63,10 @@ export default function ImageToPdfPage() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [filename, setFilename] = useState('converted')
   const [isConverting, setIsConverting] = useState(false)
+  const [progress, setProgress] = useState(0)
   const [pageSize, setPageSize] = useState<'auto' | 'A4' | 'Letter'>('auto')
+  const [quality, setQuality] = useState(90)
+  const [resizeRatio, setResizeRatio] = useState(100)
 
   const sensors = useSensors(useSensor(PointerSensor))
 
@@ -100,13 +105,21 @@ export default function ImageToPdfPage() {
 
   const activeImage = images.find((img) => img.id === activeId)
 
+  const totalImageBytes = useMemo(() => images.reduce((acc, img) => acc + img.file.size, 0), [images])
+  const estimatedPdfSizeMB = useMemo(() => {
+    const ratio = (resizeRatio / 100) * (quality / 100)
+    return ((totalImageBytes * ratio) / (1024 * 1024)).toFixed(2)
+  }, [totalImageBytes, resizeRatio, quality])
+
   const handleConvertToPdf = async () => {
     if (images.length === 0) return
     setIsConverting(true)
+    setProgress(0)
     const pdf = new jsPDF({
       format: pageSize === 'A4' ? 'a4' : pageSize === 'Letter' ? 'letter' : undefined
     })
 
+    const scale = resizeRatio / 100
     for (let i = 0; i < images.length; i++) {
       const img = images[i]
       const dataUrl = await new Promise<string>((resolve) => {
@@ -116,15 +129,21 @@ export default function ImageToPdfPage() {
       })
 
       const imgProps = pdf.getImageProperties(dataUrl)
-      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfWidth = pdf.internal.pageSize.getWidth() * scale
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
 
       if (i > 0) pdf.addPage()
-      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight)
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
+
+      setProgress(Math.round(((i + 1) / images.length) * 100))
     }
 
     pdf.save(`${filename || 'converted'}.pdf`)
     setIsConverting(false)
+
+    toast.success('✅ PDF 저장 완료', {
+      description: `${filename || 'converted'}.pdf 파일이 저장되었습니다.`
+    })
   }
 
   return (
@@ -157,13 +176,7 @@ export default function ImageToPdfPage() {
                 <label htmlFor="filename" className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
                   PDF 파일 이름
                 </label>
-                <Input
-                  id="filename"
-                  type="text"
-                  value={filename}
-                  onChange={(e) => setFilename(e.target.value)}
-                  placeholder="converted"
-                />
+                <Input id="filename" type="text" value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="converted" />
               </div>
               <div className="w-1/5">
                 <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
@@ -183,22 +196,50 @@ export default function ImageToPdfPage() {
                 </DropdownMenu>
               </div>
             </div>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  이미지 품질 (압축률)
+                </label>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  step={5}
+                  value={quality}
+                  onChange={(e) => setQuality(Number(e.target.value))}
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">{quality}%</p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  리사이즈 비율
+                </label>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  step={10}
+                  value={resizeRatio}
+                  onChange={(e) => setResizeRatio(Number(e.target.value))}
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">{resizeRatio}%</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 mt-4">
+              예상 PDF 용량: <strong>{estimatedPdfSizeMB}MB</strong>{' '}
+              {parseFloat(estimatedPdfSizeMB) > 50 && <span className="text-red-500 ml-2">❗ 50MB를 초과할 수 있습니다.</span>}
+            </p>
           </div>
 
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <SortableContext items={images.map((img) => img.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-wrap gap-4">
                 {images.map((image) => (
-                  <SortableImage
-                    key={image.id}
-                    image={image}
-                    onRemove={() => handleRemove(image.id)}
-                  />
+                  <SortableImage key={image.id} image={image} onRemove={() => handleRemove(image.id)} />
                 ))}
               </div>
             </SortableContext>
@@ -214,6 +255,13 @@ export default function ImageToPdfPage() {
           <Button onClick={handleConvertToPdf} className="mt-6" disabled={isConverting}>
             {isConverting ? '변환 중...' : 'PDF로 저장'}
           </Button>
+
+          {isConverting && (
+            <div className="mt-4">
+              <Progress value={progress} />
+              <p className="text-sm text-gray-500 mt-2">진행률: {progress}%</p>
+            </div>
+          )}
         </section>
       )}
     </main>
