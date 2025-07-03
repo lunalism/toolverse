@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FilePlus, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,7 @@ export default function PdfSplitPage() {
   const [splitFiles, setSplitFiles] = useState<{ name: string; blob: Blob }[]>([])
   const [splitMode, setSplitMode] = useState<'all' | 'range' | 'manual'>('all')
   const [range, setRange] = useState('')
+  const [rangeSplitMode, setRangeSplitMode] = useState<'group' | 'each'>('group')
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [selectedPages, setSelectedPages] = useState<number[]>([])
   const [loadingPreview, setLoadingPreview] = useState(false)
@@ -39,19 +40,23 @@ export default function PdfSplitPage() {
     multiple: false,
   })
 
-  const parsePageRange = (range: string, max: number): number[] => {
-    const pages = new Set<number>()
+  const parseRangeGroups = (range: string, max: number): number[][] => {
+    const groups: number[][] = []
     const parts = range.split(',')
     for (const part of parts) {
       if (part.includes('-')) {
         const [start, end] = part.split('-').map(Number)
-        for (let i = start; i <= Math.min(end, max); i++) pages.add(i - 1)
+        const group: number[] = []
+        for (let i = start; i <= Math.min(end, max); i++) {
+          group.push(i - 1)
+        }
+        groups.push(group)
       } else {
         const page = Number(part)
-        if (page >= 1 && page <= max) pages.add(page - 1)
+        if (page >= 1 && page <= max) groups.push([page - 1])
       }
     }
-    return [...pages].sort((a, b) => a - b)
+    return groups
   }
 
   const handleSplit = async () => {
@@ -68,23 +73,49 @@ export default function PdfSplitPage() {
       const totalPages = originalPdf.getPageCount()
       const results: { name: string; blob: Blob }[] = []
 
-      const pagesToExtract =
-        splitMode === 'range'
-          ? parsePageRange(range, totalPages)
-          : splitMode === 'manual'
-          ? selectedPages
-          : Array.from({ length: totalPages }, (_, i) => i)
+      if (splitMode === 'range') {
+        const groups = parseRangeGroups(range, totalPages)
+        if (rangeSplitMode === 'group') {
+          for (let i = 0; i < groups.length; i++) {
+            const newPdf = await PDFDocument.create()
+            const copiedPages = await newPdf.copyPages(originalPdf, groups[i])
+            copiedPages.forEach((page) => newPdf.addPage(page))
+            const pdfBytes = await newPdf.save()
+            results.push({
+              name: `range-${i + 1}.pdf`,
+              blob: new Blob([pdfBytes], { type: 'application/pdf' })
+            })
+          }
+        } else {
+          for (let i = 0; i < groups.length; i++) {
+            for (const pageIndex of groups[i]) {
+              const newPdf = await PDFDocument.create()
+              const [copiedPage] = await newPdf.copyPages(originalPdf, [pageIndex])
+              newPdf.addPage(copiedPage)
+              const pdfBytes = await newPdf.save()
+              results.push({
+                name: `page-${pageIndex + 1}.pdf`,
+                blob: new Blob([pdfBytes], { type: 'application/pdf' })
+              })
+            }
+          }
+        }
+      } else {
+        const pagesToExtract =
+          splitMode === 'manual'
+            ? selectedPages
+            : Array.from({ length: totalPages }, (_, i) => i)
 
-      for (const i of pagesToExtract) {
-        const newPdf = await PDFDocument.create()
-        const [copiedPage] = await newPdf.copyPages(originalPdf, [i])
-        newPdf.addPage(copiedPage)
-
-        const pdfBytes = await newPdf.save()
-        results.push({
-          name: `page-${i + 1}.pdf`,
-          blob: new Blob([pdfBytes], { type: 'application/pdf' })
-        })
+        for (const i of pagesToExtract) {
+          const newPdf = await PDFDocument.create()
+          const [copiedPage] = await newPdf.copyPages(originalPdf, [i])
+          newPdf.addPage(copiedPage)
+          const pdfBytes = await newPdf.save()
+          results.push({
+            name: `page-${i + 1}.pdf`,
+            blob: new Blob([pdfBytes], { type: 'application/pdf' })
+          })
+        }
       }
 
       setSplitFiles(results)
@@ -188,10 +219,25 @@ export default function PdfSplitPage() {
           </div>
 
           {splitMode === 'range' && (
-            <div className="mb-4">
-              <label htmlFor="range" className="block text-sm font-medium text-gray-700 mb-1">페이지 범위 입력</label>
-              <Input id="range" placeholder="예: 1,3-5,8" value={range} onChange={(e) => setRange(e.target.value)} />
-            </div>
+            <>
+              <div className="mb-4">
+                <label htmlFor="range" className="block text-sm font-medium text-gray-700 mb-1">페이지 범위 입력</label>
+                <Input id="range" placeholder="예: 1-3,5,8-9" value={range} onChange={(e) => setRange(e.target.value)} />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">범위 처리 방식</label>
+                <RadioGroup defaultValue="group" className="flex space-x-4" onValueChange={(val) => setRangeSplitMode(val as 'group' | 'each')}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="group" id="group" />
+                    <label htmlFor="group" className="text-sm">묶음으로 분할</label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="each" id="each" />
+                    <label htmlFor="each" className="text-sm">각 페이지마다 분할</label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </>
           )}
 
           {loadingPreview && splitMode === 'manual' && (
