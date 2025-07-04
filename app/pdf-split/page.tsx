@@ -1,5 +1,6 @@
 'use client'
 
+import NextImage from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FilePlus, Trash } from 'lucide-react'
@@ -283,7 +284,7 @@ export default function PdfSplitPage() {
                       )
                     }
                   />
-                  <img src={url} alt={`Page ${index + 1}`} className="w-full" />
+                  <NextImage src={url} alt={`Page ${index + 1}`} width={400} height={600} className="w-full h-auto object-contain" />
                   <div className="text-sm text-center py-1 bg-gray-100">페이지 {index + 1}</div>
                 </div>
               ))}
