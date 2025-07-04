@@ -147,18 +147,18 @@ export default function ColorFromImage() {
             <div className="mt-6">
                 <h3 className="text-sm font-medium mb-2">🎨 컬러 팔레트</h3>
                 <div className="grid grid-cols-5 gap-2">
-                {palette.map((color) => (
-                    <div
-                    key={color}
-                    className="h-12 rounded cursor-pointer border"
-                    style={{ backgroundColor: color }}
-                    title={color}
-                    onClick={() => {
-                        navigator.clipboard.writeText(color)
-                        alert(`복사됨: ${color}`)
-                    }}
-                    />
-                ))}
+                    {palette.map((color, i) => (
+                        <div
+                            key={`${color}-${i}`} // 고유한 key 보장
+                            className="h-12 rounded cursor-pointer border"
+                            style={{ backgroundColor: color }}
+                            title={color}
+                            onClick={() => {
+                            navigator.clipboard.writeText(color)
+                            alert(`복사됨: ${color}`)
+                            }}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
