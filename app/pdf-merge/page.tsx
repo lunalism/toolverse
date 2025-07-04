@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Trash2 } from 'lucide-react'
+import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 
@@ -29,17 +30,17 @@ export default function PDFMergePage() {
         const pages: string[] = []
 
         for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const viewport = page.getViewport({ scale: 0.5 }) // 썸네일 크기 조정
-        const canvas = document.createElement('canvas')
-        const context = canvas.getContext('2d')!
-        canvas.width = viewport.width
-        canvas.height = viewport.height
+            const page = await pdf.getPage(i)
+            const viewport = page.getViewport({ scale: 0.5 }) // 썸네일 크기 조정
+            const canvas = document.createElement('canvas')
+            const context = canvas.getContext('2d')!
+            canvas.width = viewport.width
+            canvas.height = viewport.height
 
-        await page.render({ canvasContext: context, viewport }).promise
-        pages.push(canvas.toDataURL())
+            await page.render({ canvasContext: context, viewport }).promise
+            pages.push(canvas.toDataURL())
 
-        onProgress(Math.round((i / pdf.numPages) * 100))
+            onProgress(Math.round((i / pdf.numPages) * 100))
         }
 
         return pages
@@ -48,31 +49,58 @@ export default function PDFMergePage() {
     // DropZone 설정
     const onDrop = useCallback((acceptedFiles: File[]) => {
         acceptedFiles.forEach(file => {
-        const url = URL.createObjectURL(file)
-        const newPDF: UploadedPDF = {
-            file,
-            url,
-            pages: [],
-            progress: 0,
-        }
+            const url = URL.createObjectURL(file)
+            const newPDF: UploadedPDF = {
+                file,
+                url,
+                pages: [],
+                progress: 0,
+            }
 
-        setPdfList(prev => [...prev, newPDF])
+            setPdfList(prev => [...prev, newPDF])
 
-        renderPdfPages(file, progress => {
-            setPdfList(prev =>
-            prev.map(p =>
-                p.file === file ? { ...p, progress } : p
-            )
-            )
-        }).then(pages => {
-            setPdfList(prev =>
-            prev.map(p =>
-                p.file === file ? { ...p, pages, progress: 100 } : p
-            )
-            )
-        })
+            renderPdfPages(file, progress => {
+                setPdfList(prev =>
+                prev.map(p =>
+                    p.file === file ? { ...p, progress } : p
+                )
+                )
+            }).then(pages => {
+                setPdfList(prev =>
+                    prev.map(p =>
+                        p.file === file ? { ...p, pages, progress: 100 } : p
+                    )
+                )
+            })
         })
     }, [])
+
+    const handleMerge = async () => {
+        if (pdfList.length < 2) return
+
+        const mergedPdf = await PDFDocument.create()
+
+        for (const pdfFile of pdfList) {
+            const arrayBuffer = await pdfFile.file.arrayBuffer()
+            const currentPdf = await PDFDocument.load(arrayBuffer)
+            const copiedPages = await mergedPdf.copyPages(currentPdf, currentPdf.getPageIndices())
+
+            copiedPages.forEach((page) => {
+                mergedPdf.addPage(page)
+            })
+        }
+
+        const mergedBytes = await mergedPdf.save()
+        const blob = new Blob([mergedBytes], { type: 'application/pdf' })
+        const url = URL.createObjectURL(blob)
+
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'merged.pdf'
+        a.click()
+
+        URL.revokeObjectURL(url)
+    }
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -104,9 +132,11 @@ export default function PDFMergePage() {
             {/* 썸네일 영역 */}
             {pdfList.length > 0 && (
                 <div className="mt-6 relative">
-                    {/* 병합 버튼: 우측 상단 */}
-                    <div className="absolute right-0 top-0 z-10">
-                        <Button disabled>병합하기 (다음 단계 예정)</Button>
+                    {/* 병합 버튼: 전체 영역의 오른쪽 상단으로 배치 */}
+                    <div className="flex justify-end mb-2">
+                        <Button onClick={handleMerge} disabled={pdfList.length < 2}>
+                        병합하기
+                        </Button>
                     </div>
 
                     {/* 썸네일 카드 그리드 */}
