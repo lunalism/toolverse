@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import zxcvbn from 'zxcvbn'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Copy } from 'lucide-react'
+import { Copy, Minus, Plus, RefreshCw } from 'lucide-react'
 import { ToggleOption } from '@/components/ToggleOption'
 
 export default function PasswordGeneratorPage() {
@@ -17,87 +16,117 @@ export default function PasswordGeneratorPage() {
   const [includeSymbols, setIncludeSymbols] = useState(false)
   const [password, setPassword] = useState('')
 
+  const generatePassword = () => {
+    let charset = ''
+    if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz'
+    if (includeNumbers) charset += '0123456789'
+    if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?'
+
+    if (!charset) {
+      toast.error('하나 이상의 문자 유형을 선택해주세요.')
+      return
+    }
+
+    let result = ''
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length)
+      result += charset[randomIndex]
+    }
+    setPassword(result)
+  }
+
+  const copyPassword = () => {
+    if (!password) return
+    navigator.clipboard.writeText(password)
+    toast.success('비밀번호가 복사되었습니다!')
+  }
+
+  const strength = zxcvbn(password)
+  const score = strength.score // 0~4
+  const strengthLabel = ['너무 약함', '약함', '보통', '강함', '매우 강함'][score]
+  const strengthColor = [
+    'bg-red-200 text-red-800',
+    'bg-orange-200 text-orange-800',
+    'bg-yellow-200 text-yellow-800',
+    'bg-green-200 text-green-800',
+    'bg-green-300 text-green-900',
+  ][score]
+
   return (
-    <div className="max-w-xl mx-auto px-4 py-12 space-y-6">
-      {/* 헤더 */}
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
-          <span className="text-2xl">🔐</span>
-          패스워드 생성기
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          안전한 랜덤 비밀번호를 빠르게 만들어보세요.
+    <div className="max-w-2xl mx-auto px-4 py-12">
+      {/* Hero Section */}
+      <div className="text-center mb-10 space-y-2">
+        <h1 className="text-4xl font-extrabold tracking-tight">무작위 비밀번호 생성기</h1>
+        <p className="text-muted-foreground text-base">
+          강력하고 안전한 비밀번호를 생성하여 온라인 계정을 보호하세요.
         </p>
       </div>
 
-      {/* 길이 설정 */}
-      <div>
-        <Label className="mb-2 block font-medium">
-          비밀번호 길이: <span className="font-bold text-primary">{length}자</span>
-        </Label>
-        <Slider
-          min={8}
-          max={32}
-          step={1}
-          defaultValue={[length]}
-          onValueChange={([val]) => setLength(val)}
-        />
+      {/* 결과창 + 복사 + 강도 */}
+      <div className="flex items-center gap-2 justify-center mb-6">
+        <div className="flex items-center justify-between rounded-full border px-6 py-3 shadow-inner bg-background text-lg font-mono text-center min-w-[280px] w-full max-w-[420px]">
+          <span className="truncate">{password || '비밀번호를 생성하세요'}</span>
+          {password && (
+            <span className={`ml-4 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${strengthColor}`}>
+              {strengthLabel}
+            </span>
+          )}
+        </div>
+        <Button variant="outline" onClick={copyPassword}>
+          <Copy className="w-4 h-4 mr-1" /> 복사
+        </Button>
       </div>
 
-      {/* 문자 옵션 */}
-      <div className="grid grid-cols-2 gap-4">
-        <ToggleOption
-          id="uppercase"
-          label="대문자 (A-Z)"
-          checked={includeUppercase}
-          onChange={setIncludeUppercase}
-        />
-        <ToggleOption
-          id="lowercase"
-          label="소문자 (a-z)"
-          checked={includeLowercase}
-          onChange={setIncludeLowercase}
-        />
-        <ToggleOption
-          id="numbers"
-          label="숫자 (0-9)"
-          checked={includeNumbers}
-          onChange={setIncludeNumbers}
-        />
-        <ToggleOption
-          id="symbols"
-          label="특수문자 (!@#$...)"
-          checked={includeSymbols}
-          onChange={setIncludeSymbols}
-        />
+      {/* 길이 조절 */}
+      <div className="flex items-center justify-center gap-4 mb-4">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setLength((prev) => Math.max(8, prev - 1))}
+        >
+          <Minus className="w-4 h-4" />
+        </Button>
+        <div className="text-base font-medium">
+          비밀번호 길이: <span className="font-bold">{length}</span>
+        </div>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setLength((prev) => Math.min(32, prev + 1))}
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+      <Slider
+        min={8}
+        max={32}
+        step={1}
+        value={[length]}
+        onValueChange={([val]) => setLength(val)}
+        className="mx-auto w-3/4 mb-6"
+      />
+
+      {/* 문자 유형 선택 */}
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <ToggleOption id="uppercase" label="ABC" checked={includeUppercase} onChange={setIncludeUppercase} />
+        <ToggleOption id="lowercase" label="abc" checked={includeLowercase} onChange={setIncludeLowercase} />
+        <ToggleOption id="numbers" label="123" checked={includeNumbers} onChange={setIncludeNumbers} />
+        <ToggleOption id="symbols" label="#$&" checked={includeSymbols} onChange={setIncludeSymbols} />
       </div>
 
       {/* 생성 버튼 */}
-      <Button className="w-full text-base font-semibold rounded-xl">
-        비밀번호 생성
-      </Button>
+      <div className="flex justify-center">
+        <Button size="lg" className="rounded-full px-6 text-base" onClick={generatePassword}>
+          <RefreshCw className="w-4 h-4 mr-2" /> 비밀번호 생성
+        </Button>
+      </div>
 
-      {/* 결과 표시 */}
-      {password && (
-        <div className="relative rounded-lg border p-3 shadow-sm">
-          <Input
-            readOnly
-            value={password}
-            className="pr-10 text-center font-mono text-base border-none"
-          />
-          <Button
-            size="icon"
-            variant="ghost"
-            className="absolute right-2 top-1/2 -translate-y-1/2"
-            onClick={() => {
-              navigator.clipboard.writeText(password)
-              toast.success('복사되었습니다!')
-            }}
-          >
-            <Copy className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
+      {/* 신뢰 메시지 */}
+      <p className="text-sm text-muted-foreground text-center mt-8">
+        모든 비밀번호는 <span className="font-semibold text-foreground">로컬에서 생성</span>되며,
+        절대 인터넷으로 전송되지 않습니다.
+      </p>
     </div>
   )
 }
