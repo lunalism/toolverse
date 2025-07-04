@@ -24,9 +24,11 @@ export default function PdfSplitPage() {
   const [selectedPages, setSelectedPages] = useState<number[]>([])
   const [loadingPreview, setLoadingPreview] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState(0)
+  const [progressPercent, setProgressPercent] = useState(0)
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
+      setLoadingPreview(true)
       setPdfFile(acceptedFiles[0])
       setSplitFiles([])
       setPreviewUrls([])
@@ -67,26 +69,34 @@ export default function PdfSplitPage() {
     }
 
     setIsSplitting(true)
+    setProgressPercent(0)
     try {
       const bytes = await pdfFile.arrayBuffer()
       const originalPdf = await PDFDocument.load(bytes)
       const totalPages = originalPdf.getPageCount()
       const results: { name: string; blob: Blob }[] = []
 
+      const updateProgress = (index: number, total: number) => {
+        const percent = Math.round((index / total) * 100)
+        setProgressPercent(percent)
+      }
+
       if (splitMode === 'range') {
         const groups = parseRangeGroups(range, totalPages)
         if (rangeSplitMode === 'group') {
-          for (let i = 0; i < groups.length; i++) {
-            const newPdf = await PDFDocument.create()
-            const copiedPages = await newPdf.copyPages(originalPdf, groups[i])
-            copiedPages.forEach((page) => newPdf.addPage(page))
-            const pdfBytes = await newPdf.save()
-            results.push({
-              name: `range-${i + 1}.pdf`,
-              blob: new Blob([pdfBytes], { type: 'application/pdf' })
-            })
-          }
+          const allPages = groups.flat()
+          const newPdf = await PDFDocument.create()
+          const copiedPages = await newPdf.copyPages(originalPdf, allPages)
+          copiedPages.forEach((page) => newPdf.addPage(page))
+          const pdfBytes = await newPdf.save()
+          results.push({
+            name: `merged.pdf`,
+            blob: new Blob([pdfBytes], { type: 'application/pdf' })
+          })
+          updateProgress(1, 1)
         } else {
+          let total = groups.flat().length
+          let current = 0
           for (let i = 0; i < groups.length; i++) {
             for (const pageIndex of groups[i]) {
               const newPdf = await PDFDocument.create()
@@ -97,6 +107,8 @@ export default function PdfSplitPage() {
                 name: `page-${pageIndex + 1}.pdf`,
                 blob: new Blob([pdfBytes], { type: 'application/pdf' })
               })
+              current++
+              updateProgress(current, total)
             }
           }
         }
@@ -106,15 +118,17 @@ export default function PdfSplitPage() {
             ? selectedPages
             : Array.from({ length: totalPages }, (_, i) => i)
 
-        for (const i of pagesToExtract) {
+        for (let i = 0; i < pagesToExtract.length; i++) {
+          const pageIndex = pagesToExtract[i]
           const newPdf = await PDFDocument.create()
-          const [copiedPage] = await newPdf.copyPages(originalPdf, [i])
+          const [copiedPage] = await newPdf.copyPages(originalPdf, [pageIndex])
           newPdf.addPage(copiedPage)
           const pdfBytes = await newPdf.save()
           results.push({
-            name: `page-${i + 1}.pdf`,
+            name: `page-${pageIndex + 1}.pdf`,
             blob: new Blob([pdfBytes], { type: 'application/pdf' })
           })
+          updateProgress(i + 1, pagesToExtract.length)
         }
       }
 
@@ -177,32 +191,45 @@ export default function PdfSplitPage() {
 
   return (
     <main className="max-w-screen-md mx-auto px-4 py-20">
+      {/* 상단 제목 */}
       <h1 className="text-2xl font-bold mb-4">📄 PDF 분할 도구</h1>
 
-      <div
-        {...getRootProps()}
-        className={`flex flex-col items-center justify-center w-full h-64 border-2 rounded-md cursor-pointer transition-all duration-200 ease-in-out
-          ${isDragActive ? 'border-blue-500 border-dashed bg-blue-50' : 'border-gray-300 border-dashed hover:border-blue-500 hover:bg-blue-50'}`}
-      >
-        <input {...getInputProps()} />
-        <FilePlus className="w-10 h-10 mb-3 text-gray-400" />
-        <p className="text-lg font-medium text-gray-700">PDF 파일을 여기에 드롭하세요</p>
-        <p className="text-sm text-gray-500">또는 클릭하여 파일 선택</p>
-        <p className="mt-2 text-xs text-gray-400">최대 파일 크기: 50MB</p>
-      </div>
+      {/* 업로드 전 */}
+      {!pdfFile && (
+        <div {...getRootProps()} className="border-2 border-dashed rounded-xl p-12 text-center cursor-pointer hover:border-blue-400 transition">
+          <input {...getInputProps()} />
+          <FilePlus className="mx-auto w-12 h-12 text-muted-foreground" />
+          <p className="text-xl font-semibold mt-2">PDF 파일을 여기에 드롭하세요</p>
+          <p className="text-muted-foreground">또는 클릭하여 파일 선택</p>
+          <p className="text-sm text-muted-foreground mt-2">최대 파일 크기: 50MB</p>
+        </div>
+      )}
 
-      {pdfFile && (
-        <section className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-sm text-gray-700">업로드된 파일: <strong>{pdfFile.name}</strong></p>
-            <Button size="sm" variant="destructive" onClick={() => setPdfFile(null)}>
+      {/* 업로드 됐고 로딩 중일 때만 미리보기 진행 상태 출력 */}
+      {pdfFile && loadingPreview && (
+        <div className="mt-8">
+          <p className="mb-2 text-sm text-muted-foreground">PDF를 로딩중입니다...</p>
+          <Progress value={loadingPercent} />
+          <p className="text-sm text-muted-foreground mt-1">{loadingPercent}% 완료</p>
+        </div>
+      )}
+
+      {/* 로딩이 완료된 경우에만 본 UI 렌더링 */}
+      {pdfFile && !loadingPreview && (
+        <>
+          <div className="flex items-center justify-between mt-6">
+            <p className="text-sm font-semibold">
+              업로드된 파일: <span className="font-bold">{pdfFile.name}</span>
+            </p>
+            <Button variant="destructive" size="sm" onClick={() => setPdfFile(null)}>
               <Trash className="w-4 h-4 mr-1" /> 제거
             </Button>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">분할 방식 선택</label>
-            <RadioGroup defaultValue="all" className="flex space-x-6" onValueChange={(val) => setSplitMode(val as 'all' | 'range' | 'manual')}>
+          {/* 분할 방식 선택 */}
+          <div className="my-6">
+            <h2 className="text-base font-medium mb-2">분할 방식 선택</h2>
+            <RadioGroup defaultValue="all" className="flex gap-6" onValueChange={(val) => setSplitMode(val as 'all' | 'range' | 'manual')}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="all" id="mode-all" />
                 <label htmlFor="mode-all" className="text-sm">전체 분할</label>
@@ -218,6 +245,7 @@ export default function PdfSplitPage() {
             </RadioGroup>
           </div>
 
+          {/* 범위 분할 옵션 */}
           {splitMode === 'range' && (
             <>
               <div className="mb-4">
@@ -240,17 +268,42 @@ export default function PdfSplitPage() {
             </>
           )}
 
-          {loadingPreview && splitMode === 'manual' && (
-            <div className="mb-6">
-              <p className="text-sm text-gray-600 mb-2">PDF 미리보기를 불러오는 중입니다... ({loadingPercent}%)</p>
-              <Progress value={loadingPercent} />
+          {/* 미리보기 분할 선택 */}
+          {splitMode === 'manual' && previewUrls.length > 0 && (
+            <div className="mb-6 grid grid-cols-3 gap-4">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative border rounded shadow overflow-hidden">
+                  <input
+                    type="checkbox"
+                    className="absolute top-2 left-2 w-4 h-4 z-10"
+                    checked={selectedPages.includes(index)}
+                    onChange={() =>
+                      setSelectedPages((prev) =>
+                        prev.includes(index) ? prev.filter((p) => p !== index) : [...prev, index]
+                      )
+                    }
+                  />
+                  <img src={url} alt={`Page ${index + 1}`} className="w-full" />
+                  <div className="text-sm text-center py-1 bg-gray-100">페이지 {index + 1}</div>
+                </div>
+              ))}
             </div>
           )}
 
+          {/* 분할 실행 버튼 */}
           <Button onClick={handleSplit} disabled={isSplitting} className="mb-6">
             {isSplitting ? '분할 중...' : (splitMode === 'all' ? '전체 페이지로 분할하기' : splitMode === 'range' ? '선택한 범위로 분할하기' : '선택한 페이지로 분할하기')}
           </Button>
 
+          {/* 분할 중 진행률 */}
+          {isSplitting && (
+            <div className="mt-4">
+              <Progress value={progressPercent} />
+              <p className="text-sm text-gray-500 mt-1">{progressPercent}% 완료</p>
+            </div>
+          )}
+
+          {/* 결과 파일 목록 */}
           {splitFiles.length > 0 && (
             <div className="mb-6 space-y-2">
               <h2 className="text-lg font-semibold">📂 분할된 파일 목록</h2>
@@ -262,31 +315,11 @@ export default function PdfSplitPage() {
               <Button onClick={handleDownloadZip} className="mt-4">ZIP으로 다운로드</Button>
             </div>
           )}
-
-          {previewUrls.length > 0 && (
-            <div className="mb-6 grid grid-cols-3 gap-4">
-              {previewUrls.map((url, index) => (
-                <div key={index} className="border rounded shadow overflow-hidden relative">
-                  {splitMode === 'manual' && (
-                    <input
-                      type="checkbox"
-                      className="absolute top-2 left-2 w-4 h-4 z-10"
-                      checked={selectedPages.includes(index)}
-                      onChange={() => {
-                        setSelectedPages((prev) =>
-                          prev.includes(index) ? prev.filter((p) => p !== index) : [...prev, index]
-                        )
-                      }}
-                    />
-                  )}
-                  <img src={url} alt={`Page ${index + 1}`} className="w-full" />
-                  <div className="text-sm text-center py-1 bg-gray-100">페이지 {index + 1}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+        </>
       )}
     </main>
   )
+
+
+
 }
