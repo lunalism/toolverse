@@ -3,6 +3,7 @@ import { Providers } from './providers'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import type { Metadata } from 'next'
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: 'Toolverse',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Header />
           <main className="flex-1 w-full max-w-screen-xl mx-auto px-4 pt-28 pb-8">
+            <Toaster position="top-center" richColors />
             {children}
           </main>
           <Footer />
