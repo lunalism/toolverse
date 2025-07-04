@@ -44,11 +44,13 @@ function SortableItem({ pdf, index, onRemove }: {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({ id: pdf.file.name })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    zIndex: isDragging ? 50 : undefined,
   }
 
   return (
