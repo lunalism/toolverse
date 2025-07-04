@@ -1,3 +1,5 @@
-// types/pdfjs-dist.d.ts
-
-declare module 'pdfjs-dist/legacy/build/pdf.worker.entry';
+// types/pdfjs-worker.d.ts
+declare module 'pdfjs-dist/build/pdf.worker.entry' {
+  const workerSrc: string
+  export default workerSrc
+}
