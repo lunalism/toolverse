@@ -9,6 +9,21 @@ import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 type UploadedPDF = {
@@ -18,9 +33,68 @@ type UploadedPDF = {
   progress: number
 }
 
+function SortableItem({ pdf, index, onRemove }: {
+  pdf: UploadedPDF
+  index: number
+  onRemove: (index: number) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: pdf.file.name })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="relative border rounded-lg bg-gray-50 p-4 shadow-sm flex flex-col items-center"
+    >
+      <div className="flex justify-between items-center w-full mb-2">
+        <span className="text-sm font-medium truncate">{pdf.file.name}</span>
+        <Button variant="ghost" size="icon" onClick={() => onRemove(index)}>
+          <Trash2 className="w-4 h-4 text-red-500" />
+        </Button>
+      </div>
+      {pdf.progress < 100 ? (
+        <Progress value={pdf.progress} className="h-2 w-full mt-2" />
+      ) : (
+        <Image
+          src={pdf.pages[0]}
+          alt={`Preview of ${pdf.file.name}`}
+          width={260}
+          height={370}
+          className="object-cover border rounded-lg shadow"
+        />
+      )}
+    </div>
+  )
+}
+
 export default function PDFMergePage() {
   const [pdfList, setPdfList] = useState<UploadedPDF[]>([])
   const [outputFileName, setOutputFileName] = useState<string>('')
+
+  const sensors = useSensors(useSensor(PointerSensor))
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = pdfList.findIndex(pdf => pdf.file.name === active.id)
+    const newIndex = pdfList.findIndex(pdf => pdf.file.name === over.id)
+
+    setPdfList((items) => arrayMove(items, oldIndex, newIndex))
+  }
 
   const renderPdfPages = async (file: File, onProgress: (p: number) => void) => {
     const arrayBuffer = await file.arrayBuffer()
@@ -80,7 +154,6 @@ export default function PDFMergePage() {
       const arrayBuffer = await pdfFile.file.arrayBuffer()
       const currentPdf = await PDFDocument.load(arrayBuffer)
       const copiedPages = await mergedPdf.copyPages(currentPdf, currentPdf.getPageIndices())
-
       copiedPages.forEach(page => mergedPdf.addPage(page))
     }
 
@@ -89,8 +162,9 @@ export default function PDFMergePage() {
     const url = URL.createObjectURL(blob)
 
     const a = document.createElement('a')
+    const fileName = outputFileName.trim() || 'merged'
     a.href = url
-    a.download = outputFileName.endsWith('.pdf') ? outputFileName : `${outputFileName}.pdf`
+    a.download = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`
     a.click()
 
     URL.revokeObjectURL(url)
@@ -132,7 +206,7 @@ export default function PDFMergePage() {
               placeholder="이 곳에 병합될 PDF 파일 이름을 입력하세요"
               value={outputFileName}
               onChange={(e) => setOutputFileName(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm placeholder:text-gray-400"
             />
             <Button onClick={handleMerge} disabled={pdfList.length < 2}>
               병합하기
@@ -141,30 +215,15 @@ export default function PDFMergePage() {
 
           {/* 썸네일 카드 그리드 */}
           <div className="border rounded-lg p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
-              {pdfList.map((pdf, index) => (
-                <div key={index} className="relative border rounded-lg bg-gray-50 p-4 shadow-sm flex flex-col items-center">
-                  <div className="flex justify-between items-center w-full mb-2">
-                    <span className="text-sm font-medium truncate">{pdf.file.name}</span>
-                    <Button variant="ghost" size="icon" onClick={() => removePDF(index)}>
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
-                  </div>
-
-                  {pdf.progress < 100 ? (
-                    <Progress value={pdf.progress} className="h-2 w-full mt-2" />
-                  ) : (
-                    <Image
-                      src={pdf.pages[0]}
-                      alt={`Preview of ${pdf.file.name}`}
-                      width={260}
-                      height={370}
-                      className="object-cover border rounded-lg shadow"
-                    />
-                  )}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={pdfList.map(pdf => pdf.file.name)} strategy={verticalListSortingStrategy}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 place-items-center">
+                  {pdfList.map((pdf, index) => (
+                    <SortableItem key={pdf.file.name} pdf={pdf} index={index} onRemove={removePDF} />
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       )}
