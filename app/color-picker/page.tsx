@@ -4,14 +4,62 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Copy } from 'lucide-react'
-import { colord } from 'colord'
 import ColorPickerTabs from './tabs'
 
-export default function ColorPickerPage() {
-  const [hex, setHex] = useState('#FF5733')
-  const [palette, setPalette] = useState<string[]>([])
+interface PantoneColor {
+  name: string
+  hex: string
+}
 
-  // HEX → RGB 변환
+export default function ColorPickerPage() {
+  const [hex, setHex] = useState('#367aff')
+  const [palette, setPalette] = useState<string[]>([])
+  const [pantoneList, setPantoneList] = useState<PantoneColor[]>([])
+  const [nearestPantone, setNearestPantone] = useState<PantoneColor | null>(null)
+
+  // 팬톤 JSON 로딩
+  useEffect(() => {
+    fetch('/data/pantone.json')
+      .then((res) => res.json())
+      .then((data) => setPantoneList(data))
+  }, [])
+
+  // HEX → RGB 거리 계산
+  const rgbDistance = (a: string, b: string) => {
+    const ca = parseInt(a.slice(1), 16)
+    const cb = parseInt(b.slice(1), 16)
+    const ar = (ca >> 16) & 255
+    const ag = (ca >> 8) & 255
+    const ab = ca & 255
+    const br = (cb >> 16) & 255
+    const bg = (cb >> 8) & 255
+    const bb = cb & 255
+    return Math.sqrt((ar - br) ** 2 + (ag - bg) ** 2 + (ab - bb) ** 2)
+  }
+
+  const findNearestPantone = (targetHex: string) => {
+    let nearest = pantoneList[0]
+    let minDist = rgbDistance(targetHex, nearest.hex)
+
+    for (const p of pantoneList.slice(1)) {
+      const dist = rgbDistance(targetHex, p.hex)
+      if (dist < minDist) {
+        minDist = dist
+        nearest = p
+      }
+    }
+
+    return nearest
+  }
+
+  useEffect(() => {
+    if (pantoneList.length > 0) {
+      const nearest = findNearestPantone(hex)
+      setNearestPantone(nearest)
+    }
+  }, [hex, pantoneList])
+
+  // HEX → RGB → HSL 변환
   const hexToRgb = (hex: string) => {
     const cleanHex = hex.replace('#', '')
     const bigint = parseInt(cleanHex, 16)
@@ -21,37 +69,26 @@ export default function ColorPickerPage() {
     return `rgb(${r}, ${g}, ${b})`
   }
 
-  // RGB → HSL 변환
   const rgbToHsl = (r: number, g: number, b: number) => {
     r /= 255
     g /= 255
     b /= 255
     const max = Math.max(r, g, b)
     const min = Math.min(r, g, b)
-    let h = 0,
-      s = 0,
-      l = (max + min) / 2
+    let h = 0, s = 0, l = (max + min) / 2
 
     if (max !== min) {
       const d = max - min
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
       switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0)
-          break
-        case g:
-          h = (b - r) / d + 2
-          break
-        case b:
-          h = (r - g) / d + 4
-          break
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break
+        case g: h = (b - r) / d + 2; break
+        case b: h = (r - g) / d + 4; break
       }
       h /= 6
     }
 
-    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(
-      l * 100
-    )}%)`
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
   }
 
   const rgb = hexToRgb(hex)
@@ -61,24 +98,28 @@ export default function ColorPickerPage() {
     parseInt(rgb.match(/\d+/g)?.[2] || '0')
   )
 
-  // 팔레트 생성 함수
+  // 팔레트 생성 (밝기 변화)
   const generatePalette = (baseHex: string) => {
-    const base = colord(baseHex)
+    const base = parseInt(baseHex.slice(1), 16)
+    const r = (base >> 16) & 255
+    const g = (base >> 8) & 255
+    const b = base & 255
+    const toHex = (r: number, g: number, b: number) =>
+      `#${[r, g, b].map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('')}`
+
     return [
-      base.lighten(0.3).toHex(),
-      base.lighten(0.15).toHex(),
-      base.toHex(),
-      base.darken(0.15).toHex(),
-      base.darken(0.3).toHex(),
+      toHex(r + 50, g + 50, b + 50),
+      toHex(r + 25, g + 25, b + 25),
+      toHex(r, g, b),
+      toHex(r - 25, g - 25, b - 25),
+      toHex(r - 50, g - 50, b - 50),
     ]
   }
 
-  // hex가 바뀔 때마다 팔레트 생성
   useEffect(() => {
     setPalette(generatePalette(hex))
   }, [hex])
 
-  // 복사
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
     alert(`복사됨: ${text}`)
@@ -89,7 +130,7 @@ export default function ColorPickerPage() {
       <h1 className="text-2xl font-bold mb-4">🎨 색상 선택기 도구</h1>
       <ColorPickerTabs />
 
-      {/* 컬러 피커 */}
+      {/* 기본 컬러 인풋 */}
       <input
         type="color"
         value={hex}
@@ -118,8 +159,19 @@ export default function ColorPickerPage() {
         🧲 화면에서 색상 선택
       </Button>
 
-      {/* 미리보기 */}
-      <div className="w-full h-24 rounded mb-6 border" style={{ backgroundColor: hex }} />
+      {/* 팬톤 근접 색상 (오버레이 박스) */}
+      {nearestPantone && (
+        <div
+          className="relative w-full h-24 rounded border overflow-hidden mb-4"
+          style={{ backgroundColor: nearestPantone.hex }}
+        >
+          <div className="absolute top-1 left-1 bg-black/50 text-white text-xs p-2 rounded">
+            <div className="font-semibold">{nearestPantone.name}</div>
+            <div>{nearestPantone.hex.toUpperCase()}</div>
+            <div>{hexToRgb(nearestPantone.hex)}</div>
+          </div>
+        </div>
+      )}
 
       {/* HEX / RGB / HSL */}
       {[hex, rgb, hsl].map((value, i) => (
