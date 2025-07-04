@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Copy } from 'lucide-react'
@@ -8,7 +8,7 @@ import { Copy } from 'lucide-react'
 export default function ColorPickerPage() {
   const [hex, setHex] = useState('#FF5733')
 
-  // HEX → RGB 변환
+  // HEX → RGB 변환 함수
   const hexToRgb = (hex: string) => {
     const cleanHex = hex.replace('#', '')
     const bigint = parseInt(cleanHex, 16)
@@ -18,7 +18,7 @@ export default function ColorPickerPage() {
     return `rgb(${r}, ${g}, ${b})`
   }
 
-  // RGB → HSL 변환
+  // RGB → HSL 변환 함수
   const rgbToHsl = (r: number, g: number, b: number) => {
     r /= 255
     g /= 255
@@ -51,6 +51,7 @@ export default function ColorPickerPage() {
     )}%)`
   }
 
+  // HEX → RGB → HSL 연산
   const rgb = hexToRgb(hex)
   const hsl = rgbToHsl(
     parseInt(rgb.match(/\d+/g)?.[0] || '0'),
@@ -58,16 +59,17 @@ export default function ColorPickerPage() {
     parseInt(rgb.match(/\d+/g)?.[2] || '0')
   )
 
+  // 클립보드 복사
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text)
-    alert(`Copied: ${text}`)
+    alert(`복사됨: ${text}`)
   }
 
   return (
     <div className="max-w-md mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">🎨 색상 선택기 도구</h1>
 
-      {/* 컬러 피커 */}
+      {/* 기본 컬러 피커 */}
       <input
         type="color"
         value={hex}
@@ -75,41 +77,53 @@ export default function ColorPickerPage() {
         className="w-full h-12 rounded mb-6 cursor-pointer"
       />
 
-      {/* 색상 미리보기 */}
+      {/* EyeDropper: 화면에서 색상 선택 */}
+      <Button
+        className="mb-6 w-full"
+        onClick={async () => {
+          if (!('EyeDropper' in window)) {
+            alert('이 브라우저는 EyeDropper API를 지원하지 않습니다.')
+            return
+          }
+
+          try {
+            const eyeDropper = new (window as any).EyeDropper()
+            const result = await eyeDropper.open()
+            setHex(result.sRGBHex)
+          } catch (e) {
+            console.log('색상 선택이 취소되었습니다.')
+          }
+        }}
+      >
+        🧲 화면에서 색상 선택
+      </Button>
+
+      {/* 색상 미리보기 박스 */}
       <div
         className="w-full h-24 rounded mb-6 border"
         style={{ backgroundColor: hex }}
       />
 
-      {/* HEX */}
+      {/* HEX 필드 */}
       <div className="flex items-center gap-2 mb-4">
         <Input value={hex} readOnly />
-        <Button
-          variant="outline"
-          onClick={() => copyToClipboard(hex)}
-        >
+        <Button variant="outline" onClick={() => copyToClipboard(hex)}>
           <Copy className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* RGB */}
+      {/* RGB 필드 */}
       <div className="flex items-center gap-2 mb-4">
         <Input value={rgb} readOnly />
-        <Button
-          variant="outline"
-          onClick={() => copyToClipboard(rgb)}
-        >
+        <Button variant="outline" onClick={() => copyToClipboard(rgb)}>
           <Copy className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* HSL */}
+      {/* HSL 필드 */}
       <div className="flex items-center gap-2">
         <Input value={hsl} readOnly />
-        <Button
-          variant="outline"
-          onClick={() => copyToClipboard(hsl)}
-        >
+        <Button variant="outline" onClick={() => copyToClipboard(hsl)}>
           <Copy className="w-4 h-4" />
         </Button>
       </div>
