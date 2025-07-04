@@ -47,12 +47,37 @@ pnpm dev
 
 ## 🧩 기여 방법
 
-1. Issue 또는 PR 등록 (아이디어, 버그, 기능 제안 등 모두 환영!)
-2. PR 전 pnpm lint && pnpm build 통과 확인
-3. 커밋 메시지 스타일:
-- 영어 + 이모지 조합 예시:
-  -✨ feat: Add password strength meter
-  - 🐛 fix: Resolve image upload bug
+Toolverse는 오픈소스로 누구나 기여할 수 있습니다.  
+아래 가이드를 따라 자유롭게 기능 개선, 버그 수정, 아이디어 제안을 해주세요!
+
+### 1. Issue 또는 PR 등록
+
+- 개선 아이디어, 버그 리포트, 새로운 도구 제안 등 모두 환영합니다.
+- 먼저 [Issues](https://github.com/your-username/toolverse/issues) 탭에서 중복 여부를 확인해주세요.
+
+### 2. 개발 전 확인사항
+
+- 브랜치는 `feature/도구명` 또는 `fix/문제명`으로 생성해주세요.
+- 커밋 전 아래 명령어로 코드 정리 및 빌드 확인
+  ```bash
+  npm lint && npm build
+  ```
+
+### 3. 커밋 메시지 규칙
+
+- 영어 + 이모지 스타일을 사용합니다.
+- 예시:
+  - `✨ feat: Add password strength meter`
+  - `🐛 fix: Handle HEIC conversion error`
+  - `🎨 style: Adjust layout spacing for PDF preview`
+
+### 4. PR 작성 시 체크리스트
+
+- [ ] 기능 설명 또는 변경 내용 요약
+- [ ] 동작 스크린샷 포함 (UI 관련 변경일 경우)
+- [ ] 관련 Issue 번호 태그 (예: `Closes #12`)
+
+---
 
 ---
 
