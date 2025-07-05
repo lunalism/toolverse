@@ -3,15 +3,29 @@
 import { useState } from 'react'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { diffWords } from 'diff' // 🔥 핵심 diff 함수 import
 
 export default function TextComparePage() {
   const [textA, setTextA] = useState('')
   const [textB, setTextB] = useState('')
   const [diffResult, setDiffResult] = useState<string | null>(null)
 
-  // 비교 실행 (일단 placeholder)
   const handleCompare = () => {
-    setDiffResult('🔍 차이점이 여기에 표시됩니다.')
+    const diff = diffWords(textA, textB)
+
+    const html = diff
+      .map(part => {
+        if (part.added) {
+          return `<ins class="text-blue-600 bg-blue-100 px-1">${part.value}</ins>`
+        } else if (part.removed) {
+          return `<del class="text-red-600 bg-red-100 px-1">${part.value}</del>`
+        } else {
+          return `<span>${part.value}</span>`
+        }
+      })
+      .join('')
+
+    setDiffResult(html)
   }
 
   return (
@@ -21,7 +35,7 @@ export default function TextComparePage() {
         두 개의 텍스트를 입력하고 서로의 차이점을 비교해보세요.
       </p>
 
-      {/* 좌우 입력 영역 */}
+      {/* 입력 영역 */}
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         <div className="flex-1">
           <label className="font-medium text-sm mb-1 block">기준 텍스트</label>
@@ -50,9 +64,10 @@ export default function TextComparePage() {
 
       {/* 결과 영역 */}
       {diffResult && (
-        <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm">
-          {diffResult}
-        </div>
+        <div
+          className="border border-gray-200 rounded-lg p-4 bg-gray-50 text-sm leading-relaxed whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: diffResult }}
+        />
       )}
     </div>
   )
