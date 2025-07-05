@@ -1,73 +1,104 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
+
+// dynamic import (SSR 방지)
+const MapView = dynamic(() => import('@/components/MapView'), { ssr: false })
 
 export default function IPCheckerPage() {
     const [ipData, setIpData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
-    // 이후에 fetch 로직 추가 예정
     useEffect(() => {
-        const fetchIPInfo = async () => {
-            try {
-                const res = await fetch('https://ipinfo.io/json') // 토큰 붙이면 '?token=YOUR_TOKEN'
-                const data = await res.json()
-                setIpData(data)
-            } catch (err) {
-                toast.error('IP 정보를 불러오는 데 실패했습니다.')
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchIPInfo()
+        fetch('https://ipinfo.io/json')
+        .then((res) => res.json())
+        .then((data) => setIpData(data))
+        .catch(() => toast.error('IP 정보를 불러오는 데 실패했습니다.'))
+        .finally(() => setLoading(false))
     }, [])
 
+    const flagEmoji = ipData?.country
+        ? String.fromCodePoint(...[...ipData.country].map((c) => 127397 + c.charCodeAt(0)))
+        : ''
+
+    const hasLoc = ipData?.loc && ipData.loc.includes(',')
+
+    const lat = hasLoc ? parseFloat(ipData.loc.split(',')[0]) : null
+    const lng = hasLoc ? parseFloat(ipData.loc.split(',')[1]) : null
+
     return (
-        <div className="max-w-xl mx-auto px-4 py-12 space-y-8">
-            {/* 헤더 */}
+        <div className="max-w-2xl mx-auto px-4 py-16 space-y-10">
+            {/* 타이틀 */}
             <div className="text-center space-y-2">
-                <h1 className="text-3xl font-bold">🌐 IP 주소 확인기</h1>
-                <p className="text-muted-foreground text-sm">
-                    현재 기기의 공용 IP 주소와 위치 정보를 확인하세요.
+                <h1 className="text-4xl font-bold tracking-tight">🌐 IP 주소 확인기</h1>
+                <p className="text-muted-foreground text-base">
+                    당신의 공용 IP와 위치 정보를 빠르게 확인하세요.
                 </p>
             </div>
 
             {/* IP 주소 카드 */}
-            <Card className="text-center">
-                <CardContent className="py-6">
-                <p className="text-sm text-muted-foreground mb-2">내 IP 주소</p>
-                <div className="flex justify-center items-center gap-2 text-xl font-mono">
-                    <span>{loading ? '로딩 중...' : ipData?.ip || 'N/A'}</span>
-                    {!loading && ipData?.ip && (
-                    <Button size="icon" variant="ghost"
-                        onClick={() => {
-                            navigator.clipboard.writeText(ipData.ip)
-                            toast.success('IP 주소가 복사되었습니다!')
-                        }}
-                    >
-                        <Copy className="w-4 h-4" />
-                    </Button>
-                    )}
-                </div>
+            <Card className="shadow-lg rounded-2xl">
+                <CardHeader className="text-center text-muted-foreground text-sm">
+                    📍 내 IP 주소
+                </CardHeader>
+                <CardContent>
+                    <div className="flex justify-between items-center px-4 py-3 bg-muted rounded-md">
+                        <span className="font-mono text-lg">
+                            {loading ? '로딩 중...' : ipData?.ip || 'N/A'}
+                        </span>
+                        {!loading && ipData?.ip && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                navigator.clipboard.writeText(ipData.ip)
+                                toast.success('IP 주소가 복사되었습니다!')
+                                }}
+                            >
+                                <Copy className="w-4 h-4" />
+                            </Button>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
 
-            {/* 상세 정보 (위치 등) */}
-            <Card>
-                <CardContent className="py-6 space-y-2 text-sm">
-                <p><strong>국가:</strong> {loading ? '...' : ipData?.country || 'N/A'}</p>
-                <p><strong>도시:</strong> {loading ? '...' : ipData?.city || 'N/A'}</p>
-                <p><strong>ISP:</strong> {loading ? '...' : ipData?.org || 'N/A'}</p>
+            {/* 위치 정보 카드 */}
+            <Card className="shadow-lg rounded-2xl">
+                <CardHeader className="text-center text-muted-foreground text-sm">🌍 위치 정보</CardHeader>
+                <CardContent className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm px-4">
+                    <div className="text-muted-foreground">국가</div>
+                    <div>{loading ? '...' : `${flagEmoji} ${ipData?.country || 'N/A'}`}</div>
+
+                    <div className="text-muted-foreground">도시</div>
+                    <div>{loading ? '...' : ipData?.city || 'N/A'}</div>
+
+                    <div className="text-muted-foreground">지역</div>
+                    <div>{loading ? '...' : ipData?.region || 'N/A'}</div>
+
+                    <div className="text-muted-foreground">ISP</div>
+                    <div>{loading ? '...' : ipData?.org || 'N/A'}</div>
+
+                    <div className="text-muted-foreground">시간대</div>
+                    <div>{loading ? '...' : ipData?.timezone || 'N/A'}</div>
                 </CardContent>
             </Card>
+
+            {/* 지도 */}
+            {lat && lng && (
+                <div>
+                <h3 className="text-center text-sm text-muted-foreground mb-2">🗺️ 지도에서 보기</h3>
+                <MapView lat={lat} lng={lng} />
+                </div>
+            )}
 
             {/* 안내 문구 */}
             <p className="text-xs text-muted-foreground text-center">
-                본 정보는 <span className="font-semibold">ipinfo.io</span>를 통해 로드되며, 브라우저에서 직접 요청됩니다.
+                이 정보는 <strong>ipinfo.io</strong>로부터 직접 조회됩니다.
             </p>
         </div>
     )
