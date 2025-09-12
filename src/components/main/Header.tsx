@@ -20,7 +20,11 @@ const Header = () => {
                 PDF
               </Link>
             </li>
-            <li>Image</li>
+            <li>
+              <Link href="/image" className="hover:text-blue-500 transition-colors">
+                Image
+              </Link>
+            </li>
             <li>Text</li>
             {/* 앞으로 Link 컴포넌트로 바꿀 예정입니다 */}
           </ul>
