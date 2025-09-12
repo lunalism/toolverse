@@ -15,7 +15,11 @@ const Header = () => {
         {/* Navigation */}
         <nav>
           <ul className="flex items-center space-x-6 text-sm font-medium text-gray-600">
-            <li>PDF</li>
+            <li>
+              <Link href="/pdf" className="hover:text-blue-500 transition-colors">
+                PDF
+              </Link>
+            </li>
             <li>Image</li>
             <li>Text</li>
             {/* 앞으로 Link 컴포넌트로 바꿀 예정입니다 */}
