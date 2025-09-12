@@ -18,6 +18,7 @@ const tools = [
     { href: "/pdf/merge", title: "PDF 합치기", description: "여러 PDF를 원하는 순서대로 합쳐 하나의 파일로 만듭니다." },
     { href: "/pdf/split", title: "PDF 분할하기", description: "하나의 PDF에서 원하는 페이지만 추출하거나, 모든 페이지를 분할합니다." },
     { href: "/pdf/reorder", title: "PDF 페이지 재구성", description: "페이지 순서를 바꾸거나, 필요 없는 페이지를 삭제하여 새 PDF를 만듭니다." },
+    { href: "/pdf/to-image", title: "PDF를 이미지로 변환", description: "PDF 파일의 각 페이지를 JPG 또는 PNG 이미지 파일로 변환합니다.",},
 ];
 
 export default function PdfToolsPage() {
