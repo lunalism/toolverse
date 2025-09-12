@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✨ toolverse
 
-## Getting Started
+> Your daily tasks just got a lot more fun. Welcome to a new universe of playful web tools!
 
-First, run the development server:
+toolverse는 복잡하고 지루한 일상적인 작업을 즐거운 경험으로 바꿔주는 모던하고 감각적인 무료 웹 도구 모음집입니다. 우리는 최고의 사용자 경험을 목표로, 모든 도구를 직관적이면서도 아름답게 만듭니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 주요 기능 (Features)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+저희는 다음과 같은 다채로운 도구들을 제공할 예정입니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* 📄 **PDF Tools**: PDF 합치기, 분할하기, 압축하기 등
+* 🖼️ **Image Tools**: 이미지 리사이징, 압축, 포맷 변환 등
+* ✍️ **Text Tools**: 글자 수 세기, 마크다운 에디터, JSON 포맷터 등
+* 🎨 **Color Tools**: 색상 팔레트 생성기, 그라디언트 생성기 등
+* 🌐 **Network Tools**: 내 IP 확인, 포트 스캐너 등
+* 🛡️ **Security Tools**: 비밀번호 생성기, 해시 생성기 등
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ 기술 스택 (Tech Stack)
 
-## Learn More
+* **Framework**: Next.js (React)
+* **Styling**: Tailwind CSS
+* **UI/Components**: shadcn/ui (Headless UI)
+* **Animation**: Framer Motion
+* **Deployment**: Vercel
 
-To learn more about Next.js, take a look at the following resources:
+## 👨‍💻 시작하는 법 (Getting Started)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  이 레포지토리를 클론하세요:
+    ```bash
+    git clone [https://github.com/lunalism/toolverse.git](https://github.com/lunalism/toolverse.git)
+    ```
+2.  프로젝트 폴더로 이동하여 의존성을 설치하세요:
+    ```bash
+    cd toolverse
+    npm install
+    ```
+3.  개발 서버를 실행하세요:
+    ```bash
+    npm run dev
+    ```
+4.  브라우저에서 `http://localhost:3000` 로 접속하세요.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 라이선스 (License)
 
-## Deploy on Vercel
+이 프로젝트는 [MIT License](LICENSE)를 따릅니다.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
