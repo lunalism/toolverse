@@ -2,7 +2,7 @@
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+    <main className="flex flex-grow flex-col items-center justify-center bg-gray-50">
       <div className="text-center">
         <h1 className="text-6xl font-bold tracking-tighter text-gray-800">
           toolverse
