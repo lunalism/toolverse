@@ -4,6 +4,7 @@
 
 import { useState, ChangeEvent, DragEvent } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import { Button } from '@/components/ui/button';
 
 export default function PdfSplitPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -97,15 +98,26 @@ export default function PdfSplitPage() {
           <div className="p-4 border rounded-md bg-white space-y-4 shadow-sm">
             <h2 className="font-semibold">분할 옵션</h2>
             <div className="space-y-3">
-              <div className="flex items-center"><input type="radio" id="split-all" name="split-mode" value="all" checked={splitMode === 'all'} onChange={() => handleModeChange('all')} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" /><label htmlFor="split-all" className="ml-3 block text-sm font-medium text-gray-700">모든 페이지를 개별 파일로 분할</label></div>
-              <div className="flex items-center"><input type="radio" id="split-range" name="split-mode" value="range" checked={splitMode === 'range'} onChange={() => handleModeChange('range')} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" /><label htmlFor="split-range" className="ml-3 block text-sm font-medium text-gray-700">페이지 범위 지정 분할</label></div>
-              {splitMode === 'range' && (<div className="pl-7"><input type="text" value={range} onChange={handleRangeChange} placeholder="예: 1-3, 5, 8-10" className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${rangeError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`} />{rangeError && <p className="mt-1 text-xs text-red-600">{rangeError}</p>}</div>)}
+              <div className="flex items-center">
+                <input type="radio" id="split-all" name="split-mode" value="all" checked={splitMode === 'all'} onChange={() => handleModeChange('all')} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                <label htmlFor="split-all" className="ml-3 block text-sm font-medium text-gray-700">모든 페이지를 개별 파일로 분할</label>
+              </div>
+              <div className="flex items-center">
+                <input type="radio" id="split-range" name="split-mode" value="range" checked={splitMode === 'range'} onChange={() => handleModeChange('range')} className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                <label htmlFor="split-range" className="ml-3 block text-sm font-medium text-gray-700">페이지 범위 지정 분할</label>
+              </div>
+              {splitMode === 'range' && (
+                <div className="pl-7">
+                  <input type="text" value={range} onChange={handleRangeChange} placeholder="예: 1-3, 5, 8-10" className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${rangeError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`} />
+                  {rangeError && <p className="mt-1 text-xs text-red-600">{rangeError}</p>}
+                </div>
+              )}
             </div>
           </div>
           <div className="text-center">
-            <button onClick={handleSplit} disabled={isLoading || (splitMode === 'range' && (!range || !!rangeError))} className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-600 text-white font-bold rounded-lg shadow-md hover:opacity-90 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300">
+            <Button onClick={handleSplit} disabled={isLoading || (splitMode === 'range' && (!range || !!rangeError))} className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-600 text-white font-bold rounded-lg shadow-md hover:opacity-90 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 h-[54px]">
               {isLoading ? '파일을 분할하는 중...' : 'PDF 분할하기 & 다운로드'}
-            </button>
+            </Button>
           </div>
         </div>
       )}
