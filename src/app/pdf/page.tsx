@@ -31,6 +31,15 @@ export default function PdfToolsPage() {
                     <p className="text-gray-600">한 개의 PDF 파일 내에 있는 문서들을 여러개로 나눠보세요.</p>
                 </Link>
 
+                {/* PDF 재구성 도구 카드 */}
+                <Link 
+                    href="/pdf/reorder" 
+                    className="block p-6 border rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-white"
+                >
+                    <h2 className="text-xl font-bold mb-2">PDF 페이지 재구성</h2>
+                    <p className="text-gray-600">페이지 순서를 바꾸거나, 필요 없는 페이지를 삭제하여 새 PDF를 만듭니다.</p>
+                </Link>
+
             </div>
         </div>
     );
