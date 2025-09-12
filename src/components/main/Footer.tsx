@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Footer = () => {
     return (
-        <footer className="w-full border-t border-gray-200 bg-gray-50">
+        <footer className="w-full border-t border-gray-200 bg-white-50">
             <div className="container mx-auto flex h-16 items-center justify-between px-4 text-sm text-gray-500">
                 <div>
                     © 2025 toolverse. All Rights Reserved.

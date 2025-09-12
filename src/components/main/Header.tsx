@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="w-full border-b border-gray-200 bg-gray-50 backdrop-blur-sm">
+    <header className="w-full border-b border-gray-200 bg-white-50 backdrop-blur-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="text-2xl font-black tracking-tighter">
@@ -12,7 +12,7 @@ const Header = () => {
           <span className="text-blue-500">.</span>
         </Link>
 
-        {/* Navigation (暂时占位) */}
+        {/* Navigation */}
         <nav>
           <ul className="flex items-center space-x-6 text-sm font-medium text-gray-600">
             <li>PDF</li>
