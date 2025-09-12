@@ -6,6 +6,7 @@ import { useState, ChangeEvent, DragEvent } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Button } from '@/components/ui/button';
 
 type SortableFile = { id: string; file: File; };
 
@@ -112,13 +113,13 @@ export default function PdfMergePage() {
 
                     {/* 👇 합치기 버튼과 로딩 표시 UI */}
                     <div className="mt-8 text-center">
-                        <button
+                        <Button
                         onClick={handleMerge}
                         disabled={isLoading || files.length < 2}
-                        className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-600 text-white font-bold rounded-lg shadow-md hover:opacity-90 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300"
+                        className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-600 text-white font-bold rounded-lg shadow-md hover:opacity-90 disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-300 h-[54px]"
                         >
-                        {isLoading ? '파일을 합치는 중...' : `PDF 합치기 & 다운로드 (${files.length}개)`}
-                        </button>
+                            {isLoading ? '파일을 합치는 중...' : `PDF 합치기 & 다운로드 (${files.length}개)`}
+                        </Button>
                     </div>
                 </div>
             )}
