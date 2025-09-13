@@ -18,6 +18,11 @@ const tools = [
         title: "이미지 포맷 변환",
         description: "이미지 파일을 JPG, PNG, WEBP 등 다른 포맷으로 변환합니다.",
     },
+    {
+        href: "/image/compressor",
+        title: "이미지 압축",
+        description: "이미지 품질을 최대한 유지하며 파일 크기를 획기적으로 줄입니다.",
+    },
 ];
 
 const keywords = ['photo', 'art', 'camera', 'colorful'];
