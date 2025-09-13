@@ -13,6 +13,11 @@ const tools = [
         title: "이미지 사이즈 변환",
         description: "이미지의 가로/세로 크기를 원하는 대로 조절하고, 파일 용량을 최적화합니다.",
     },
+    {
+        href: "/image/converter",
+        title: "이미지 포맷 변환",
+        description: "이미지 파일을 JPG, PNG, WEBP 등 다른 포맷으로 변환합니다.",
+    },
 ];
 
 const keywords = ['photo', 'art', 'camera', 'colorful'];
