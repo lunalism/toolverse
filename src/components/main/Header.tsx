@@ -25,6 +25,11 @@ const Header = () => {
                 Image
               </Link>
             </li>
+            <li>
+              <Link href="/color" className="hover:text-blue-500 transition-colors">
+                Color
+              </Link>
+            </li>
             <li>Text</li>
             {/* 앞으로 Link 컴포넌트로 바꿀 예정입니다 */}
           </ul>
