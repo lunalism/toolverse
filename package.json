@@ -14,7 +14,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "color-thief-react": "^2.1.0",
+    "colorthief": "^2.6.0",
     "heic2any": "^0.0.4",
     "jszip": "^3.10.1",
     "lucide-react": "^0.544.0",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/colorthief": "^2.6.0",
     "@types/node": "^20",
     "@types/pdfjs-dist": "^2.10.377",
     "@types/react": "^19",

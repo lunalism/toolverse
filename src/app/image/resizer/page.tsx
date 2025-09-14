@@ -152,7 +152,7 @@ export default function ImageResizerPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                     <div className="space-y-4">
                         <h2 className="text-lg font-semibold">원본 이미지</h2>
-                        <div className="border rounded-lg p-2 bg-gray-50 flex items-center justify-center min-h-[200px]">
+                        <div className="border rounded-lg p-2 bg-gray-50 flex items-center justify-center h-96">
                             {originalPreviewUrl && (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={originalPreviewUrl} alt="Original Preview" className="max-w-full max-h-96 rounded" />
