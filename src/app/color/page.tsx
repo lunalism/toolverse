@@ -13,6 +13,11 @@ const tools = [
     title: "이미지 색상 추출",
     description: "이미지에서 가장 많이 사용된 색상들을 분석하여 아름다운 색상 팔레트를 만듭니다.",
   },
+  {
+    href: "/color/palette-generator",
+    title: "랜덤 색상 팔레트 생성기",
+    description: "스페이스바를 누를 때마다 서로 조화롭게 어울리는 아름다운 색상 팔레트를 만듭니다.",
+  },
 ];
 
 const keywords = ['color', 'palette', 'vibrant', 'art', 'painting'];
