@@ -1,0 +1,63 @@
+[
+    {
+        "name": "Ocean Deep",
+        "colors": ["#003b46", "#07575b", "#66a5ad", "#c4dfe6"],
+        "tags": ["blue", "teal", "cool"]
+    },
+    {
+        "name": "Sunset Vibes",
+        "colors": ["#f7b267", "#f79d65", "#f4845f", "#f27059", "#f25c54"],
+        "tags": ["red", "orange", "warm"]
+    },
+    {
+        "name": "Forest Mist",
+        "colors": ["#cad2c5", "#84a98c", "#52796f", "#354f52", "#2f3e46"],
+        "tags": ["green", "gray", "cool"]
+    },
+    {
+        "name": "Royal Purple",
+        "colors": ["#3c1874", "#6c429b", "#9f69d3", "#d096f0", "#e0b0ff"],
+        "tags": ["purple", "bold"]
+    },
+  
+    {
+        "name": "Bubblegum",
+        "colors": ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff"],
+        "tags": ["pink", "yellow", "lime", "pastel"]
+    },
+    {
+        "name": "Ruby Red",
+        "colors": ["#d00000", "#ffba08", "#3f88c5", "#032b43", "#136f63"],
+        "tags": ["red", "bold", "primary"]
+    },
+    {
+        "name": "Muted Teal",
+        "colors": ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"],
+        "tags": ["teal", "orange", "warm"]
+    },
+    {
+        "name": "Candy Floss",
+        "colors": ["#e7c6ff", "#c8b6ff", "#b8c0ff", "#bbd0ff", "#bde0fe"],
+        "tags": ["purple", "blue", "pastel"]
+    },
+    {
+        "name": "Emerald Shine",
+        "colors": ["#006466", "#065a60", "#0b525b", "#144552", "#1b3a4b"],
+        "tags": ["green", "teal", "dark"]
+    },
+    {
+        "name": "Vintage Rose",
+        "colors": ["#ffccd5", "#ffb3c1", "#ff8fa3", "#ff758f", "#ff5c8a"],
+        "tags": ["pink", "red", "warm"]
+    },
+    {
+        "name": "Golden Hour",
+        "colors": ["#fca311", "#e5e5e5", "#ffffff", "#14213d", "#000000"],
+        "tags": ["yellow", "gray", "bold"]
+    },
+    {
+        "name": "Arctic Ice",
+        "colors": ["#a9d6e5", "#89c2d9", "#61a5c2", "#468faf", "#2c7da0"],
+        "tags": ["blue", "cool", "light"]
+    }
+  ]

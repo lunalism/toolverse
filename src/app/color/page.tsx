@@ -23,6 +23,11 @@ const tools = [
     title: "CSS 그라데이션 생성기",
     description: "두 가지 이상의 색상을 조합하여 아름다운 CSS 그라데이션 코드를 만듭니다.",
   },
+  {
+    href: "/color/palettes",
+    title: "컬러 팔레트 라이브러리",
+    description: "엄선된 아름다운 색상 팔레트들을 탐색하고 영감을 얻으세요.",
+  },
 ];
 
 const keywords = ['color', 'palette', 'vibrant', 'art', 'painting'];
