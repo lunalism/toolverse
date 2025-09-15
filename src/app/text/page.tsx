@@ -13,6 +13,11 @@ const tools = [
         title: "글자 수 / 단어 수 세기",
         description: "텍스트의 글자, 단어, 줄, 문단 수를 실시간으로 분석하고 계산합니다.",
     },
+    {
+        href: "/text/diff-checker",
+        title: "텍스트 비교",
+        description: "두 개의 텍스트를 비교하여 추가, 삭제된 부분을 시각적으로 보여줍니다.",
+    },
 ];
 
 const keywords = ['writing', 'keyboard', 'library', 'code'];
