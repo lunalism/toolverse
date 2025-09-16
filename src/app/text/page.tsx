@@ -18,6 +18,11 @@ const tools = [
         title: "텍스트 비교",
         description: "두 개의 텍스트를 비교하여 추가, 삭제된 부분을 시각적으로 보여줍니다.",
     },
+    {
+        href: "/text/editor",
+        title: "만능 텍스트 편집기",
+        description: "대소문자 변환, 줄 정렬, 중복 제거 등 다양한 텍스트 조작을 한 곳에서 처리합니다.",
+    },
 ];
 
 const keywords = ['writing', 'keyboard', 'library', 'code'];
