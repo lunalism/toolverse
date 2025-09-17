@@ -103,8 +103,12 @@ export default function PasswordGeneratorPage() {
                     {/* 👇 모드 선택 UI 추가 */}
                     <div className="flex justify-end">
                         <div className="flex items-center p-1 bg-gray-200 rounded-lg">
-                            <button onClick={() => setMode('password')} className={`px-4 py-1 rounded-md text-sm font-semibold ${mode === 'password' ? 'bg-white shadow' : 'text-gray-600'}`}>비밀번호</button>
-                            <button onClick={() => setMode('pin')} className={`px-4 py-1 rounded-md text-sm font-semibold ${mode === 'pin' ? 'bg-white shadow' : 'text-gray-600'}`}>PIN</button>
+                            <Button onClick={() => setMode('password')} variant={mode === 'password' ? 'secondary' : 'ghost'} size="sm">
+                                비밀번호
+                            </Button>
+                            <Button onClick={() => setMode('pin')} variant={mode === 'pin' ? 'secondary' : 'ghost'} size="sm">
+                                PIN
+                            </Button>
                         </div>
                     </div>
         
