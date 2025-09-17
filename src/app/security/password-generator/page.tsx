@@ -2,6 +2,7 @@
 
 "use client";
 
+import { Button } from '@/components/ui/button';
 import { useState, useEffect, useCallback } from 'react';
 
 const CHARSETS = {
@@ -80,7 +81,7 @@ export default function PasswordGeneratorPage() {
             <div className="max-w-xl mx-auto">
                 <div className="relative p-4 bg-gray-900 text-white rounded-lg flex items-center justify-between font-mono text-xl break-all">
                     <span>{password}</span>
-                    <button onClick={handleCopy} className="text-gray-400 hover:text-white flex-shrink-0 ml-4">
+                    <Button onClick={handleCopy} className="text-gray-400 hover:text-white flex-shrink-0 ml-4">
                         {copied ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -91,12 +92,12 @@ export default function PasswordGeneratorPage() {
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                             </svg>
                         )}
-                    </button>
+                    </Button>
                 </div>
                 
-                <button onClick={generate} className="w-full mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
+                <Button onClick={generate} className="w-full mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
                     새 {mode === 'password' ? '비밀번호' : 'PIN'} 생성
-                </button>
+                </Button>
         
                 <div className="mt-6 p-6 border rounded-lg bg-white space-y-4 shadow-sm">
                     {/* 👇 모드 선택 UI 추가 */}
