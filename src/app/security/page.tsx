@@ -19,6 +19,11 @@ const tools = [
         title: "QR코드 생성기",
         description: "텍스트나 URL을 즉시 QR코드로 변환하고 이미지로 다운로드합니다.",
     },
+    {
+        href: "/security/hash-generator",
+        title: "해시 생성기",
+        description: "텍스트를 MD5, SHA-256 등 표준 해시 알고리즘으로 변환합니다.",
+    },
 ];
 
 const keywords = ['security', 'lock', 'code', 'abstract', 'technology'];
