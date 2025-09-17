@@ -106,7 +106,7 @@ export default function PomodoroTimerPage() {
             <div className="text-center mb-8">
                 <h1 className="text-4xl font-black tracking-tighter">뽀모도로 타이머</h1>
                 <p className="text-lg text-gray-600 mt-2">
-                    집중과 휴식의 사이클로 최고의 생산성을 경험하세요.
+                    집중과 휴식의 사이클로 최고의 생산성을 경험해보세요.
                 </p>
             </div>
             
