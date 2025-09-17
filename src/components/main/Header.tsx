@@ -40,6 +40,11 @@ const Header = () => {
                 Security
               </Link>
             </li>
+            <li>
+              <Link href="/productivity" className="hover:text-blue-500 transition-colors">
+                Productivity
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
