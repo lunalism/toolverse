@@ -14,6 +14,11 @@ const tools = [
         title: "비밀번호 생성기",
         description: "암호학적으로 안전한 강력한 비밀번호를 생성하여 보안을 강화하세요.",
     },
+    {
+        href: "/security/qr-code-generator",
+        title: "QR코드 생성기",
+        description: "텍스트나 URL을 즉시 QR코드로 변환하고 이미지로 다운로드합니다.",
+    },
 ];
 
 const keywords = ['security', 'lock', 'code', 'abstract', 'technology'];
