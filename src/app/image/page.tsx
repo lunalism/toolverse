@@ -23,6 +23,11 @@ const tools = [
         title: "이미지 압축",
         description: "이미지 품질을 최대한 유지하며 파일 크기를 획기적으로 줄입니다.",
     },
+    {
+        href: "/image/favicon-generator",
+        title: "파비콘 생성기",
+        description: "하나의 이미지로 모든 플랫폼에 필요한 파비콘과 HTML 코드를 한번에 생성합니다.",
+    },
 ];
 
 const keywords = ['photo', 'art', 'camera', 'colorful'];

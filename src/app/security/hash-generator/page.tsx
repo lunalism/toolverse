@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 // shadcn/ui의 Textarea와 Select도 함께 사용하면 디자인 통일성이 더 좋아집니다.
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 
 export default function HashGeneratorPage() {
     const [inputText, setInputText] = useState('hello world');
