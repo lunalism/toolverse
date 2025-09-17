@@ -8,7 +8,7 @@ import Link from "next/link";
 type UnsplashPhoto = { urls: { small: string; }; };
 
 // 👇 아직 만들 도구를 정하지 않았으니, tools 배열은 비워둡니다.
-const tools: any[] = [
+const tools = [
     {
         href: "/security/password-generator",
         title: "비밀번호 생성기",
