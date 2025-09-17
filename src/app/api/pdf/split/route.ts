@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
             zip.file(`${originalFileName}_page_${pageIndex + 1}.pdf`, newPdfBytes);
         }
 
-        const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+        // 👇 웹 표준 ArrayBuffer로 바로 생성합니다.
+        const zipArrayBuffer = await zip.generateAsync({ type: 'arraybuffer' });
 
         // 👇 이 부분을 합치기 도구와 동일한 방식으로 변경합니다.
         const now = new Date();
@@ -85,7 +86,8 @@ export async function POST(request: NextRequest) {
         const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
         const zipFilename = `toolverse-split_${timestamp}.zip`;
 
-        return new NextResponse(zipBuffer, {
+        // 👇 변환 없이 바로 사용합니다.
+        return new NextResponse(zipArrayBuffer, {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',

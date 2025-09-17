@@ -37,12 +37,13 @@ export async function POST(request: NextRequest) {
             
             zip.file(`${originalFileName}_compressed.${newExtension}`, compressedBuffer);
         }
-
-        const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+        // 👇 웹 표준 ArrayBuffer로 바로 생성합니다.
+        const zipArrayBuffer = await zip.generateAsync({ type: 'arraybuffer' });
         const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
         const zipFilename = `toolverse-compressed_${timestamp}.zip`;
 
-        return new NextResponse(zipBuffer, {
+        // 👇 변환 없이 바로 사용합니다.
+        return new NextResponse(zipArrayBuffer, {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',
