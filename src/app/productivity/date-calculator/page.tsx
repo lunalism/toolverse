@@ -15,9 +15,10 @@ import {
     addDays, subDays, addWeeks, subWeeks, addMonths, subMonths, addYears, subYears,
     addBusinessDays
  } from 'date-fns';
+ import { X } from 'lucide-react';
 
 
-type CalculatorMode = 'difference' | 'addSubtract' | 'workdays';
+type CalculatorMode = 'difference' | 'addSubtract' | 'workdays' | 'multi-difference';
 
 // '날짜 차이' 계산을 담당하는 컴포넌트
 function DifferenceCalculator() {
@@ -165,6 +166,83 @@ function WorkdayCalculator() {
     );
 }
 
+// 각 계산 라인의 타입을 정의합니다.
+type DatePair = {
+    id: string;
+    startDate?: Date;
+    endDate?: Date;
+}
+
+function MultiDifferenceCalculator() {
+    // state를 DatePair의 배열로 변경합니다.
+    const [datePairs, setDatePairs] = useState<DatePair[]>([
+        { id: crypto.randomUUID(), startDate: new Date(), endDate: undefined }
+    ]);
+  
+    // 날짜 변경 핸들러
+    const handleDateChange = (id: string, dateType: 'startDate' | 'endDate', newDate: Date | undefined) => {
+        setDatePairs(
+            datePairs.map(pair => 
+                pair.id === id ? { ...pair, [dateType]: newDate } : pair
+            )
+        );
+    };
+  
+    // 계산 라인 추가 핸들러
+    const handleAddRow = () => {
+        setDatePairs([...datePairs, { id: crypto.randomUUID(), startDate: undefined, endDate: undefined }]);
+    };
+  
+    // 계산 라인 삭제 핸들러
+    const handleRemoveRow = (id: string) => {
+        setDatePairs(datePairs.filter(pair => pair.id !== id));
+    };
+  
+    return (
+        <div>
+            <h2 className="text-2xl font-bold mb-4">여러 날짜 사이의 차이 계산</h2>
+            <p className="text-sm text-gray-500 mb-4">여러 개의 독립적인 날짜 구간의 차이를 한 번에 계산합니다.</p>
+            
+            {/* 👇 UI 레이아웃을 수정합니다. */}
+            <div className="space-y-3 mb-6">
+                {datePairs.map((pair) => {
+                    const result = (pair.startDate && pair.endDate) 
+                        ? differenceInDays(
+                            pair.startDate > pair.endDate ? pair.startDate : pair.endDate, 
+                            pair.startDate > pair.endDate ? pair.endDate : pair.startDate
+                        ) 
+                        : null;
+            
+                    return (
+                        <div key={pair.id} className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex-grow min-w-[200px]">
+                                <DatePicker date={pair.startDate} onDateChange={(newDate) => handleDateChange(pair.id, 'startDate', newDate)} placeholder="시작 날짜" />
+                            </div>
+                            <span className="text-gray-500">~</span>
+                            <div className="flex-grow min-w-[200px]">
+                                <DatePicker date={pair.endDate} onDateChange={(newDate) => handleDateChange(pair.id, 'endDate', newDate)} placeholder="종료 날짜" />
+                            </div>
+                            <div className="flex items-center gap-2 text-primary font-bold">
+                                <span className="hidden sm:inline">→</span>
+                                <span>{result !== null ? `${result.toLocaleString()} 일` : `...`}</span>
+                            </div>
+                            
+                            {datePairs.length > 1 && (
+                                <Button variant="ghost" size="icon" onClick={() => handleRemoveRow(pair.id)} className="flex-shrink-0 text-gray-500 hover:text-red-500">
+                                <X className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+            <Button onClick={handleAddRow} variant="outline" className="w-full">
+                계산할 날짜 쌍 추가
+            </Button>
+        </div>
+    );
+  }
+
 export default function DateCalculatorPage() {
     const [mode, setMode] = useState<CalculatorMode>('difference');
 
@@ -179,12 +257,14 @@ export default function DateCalculatorPage() {
                 <Button onClick={() => setMode('difference')} variant={mode === 'difference' ? 'secondary' : 'ghost'} className="flex-1">날짜 차이</Button>
                 <Button onClick={() => setMode('addSubtract')} variant={mode === 'addSubtract' ? 'secondary' : 'ghost'} className="flex-1">날짜 더하기/빼기</Button>
                 <Button onClick={() => setMode('workdays')} variant={mode === 'workdays' ? 'secondary' : 'ghost'} className="flex-1">업무일 계산</Button>
+                <Button onClick={() => setMode('multi-difference')} variant={mode === 'multi-difference' ? 'secondary' : 'ghost'} className="flex-1 text-xs sm:text-sm">여러 날짜 차이</Button>
             </div>
 
             <div className="p-8 border rounded-xl bg-white shadow-lg min-h-[300px]">
                 {mode === 'difference' && <DifferenceCalculator />}
                 {mode === 'addSubtract' && <AddSubtractCalculator />}
                 {mode === 'workdays' && <WorkdayCalculator />}
+                {mode === 'multi-difference' && <MultiDifferenceCalculator />}
             </div>
         </div>
     );
