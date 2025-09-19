@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { format, differenceInDays, differenceInWeeks, differenceInMonths, differenceInYears, addDays, subDays, addWeeks, subWeeks, addMonths, subMonths, addYears, subYears } from 'date-fns';
+import { 
+    format, 
+    differenceInDays, differenceInWeeks, differenceInMonths, differenceInYears,
+    addDays, subDays, addWeeks, subWeeks, addMonths, subMonths, addYears, subYears,
+    addBusinessDays
+ } from 'date-fns';
 
 
 type CalculatorMode = 'difference' | 'addSubtract' | 'workdays';
@@ -126,6 +131,40 @@ function AddSubtractCalculator() {
     );
 }
 
+// 👇 '업무일 계산'을 담당하는 새로운 컴포넌트
+function WorkdayCalculator() {
+    const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+    const [businessDays, setBusinessDays] = useState<number>(5);
+  
+    const resultDate = useMemo(() => {
+        if (!startDate || isNaN(businessDays)) return null;
+        return addBusinessDays(startDate, businessDays);
+    }, [startDate, businessDays]);
+  
+    return (
+        <div>
+            <h2 className="text-2xl font-bold mb-4">업무일 기준 날짜 계산</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 items-end">
+                <div className="space-y-1">
+                    <Label>시작 날짜</Label>
+                    <DatePicker date={startDate} onDateChange={setStartDate} placeholder="시작 날짜 선택" />
+                </div>
+                <div className="space-y-1">
+                    <Label>더할 업무일</Label>
+                    <Input type="number" value={businessDays} onChange={(e) => setBusinessDays(parseInt(e.target.value, 10) || 0)} />
+                </div>
+            </div>
+            {resultDate && (
+                <div className="p-6 bg-green-100 rounded-lg text-center">
+                    <h3 className="font-semibold mb-2 text-lg text-green-800">계산 결과 (주말 제외):</h3>
+                    <p className="text-4xl font-bold text-green-900">{format(resultDate, 'PPP')}</p>
+                    <p className="text-md text-green-700 mt-1">{format(resultDate, 'EEEE')}</p>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function DateCalculatorPage() {
     const [mode, setMode] = useState<CalculatorMode>('difference');
 
@@ -145,7 +184,7 @@ export default function DateCalculatorPage() {
             <div className="p-8 border rounded-xl bg-white shadow-lg min-h-[300px]">
                 {mode === 'difference' && <DifferenceCalculator />}
                 {mode === 'addSubtract' && <AddSubtractCalculator />}
-                {mode === 'workdays' && <p className="text-gray-500">곧 추가될 기능입니다.</p>}
+                {mode === 'workdays' && <WorkdayCalculator />}
             </div>
         </div>
     );
