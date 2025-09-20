@@ -5,6 +5,7 @@
 import * as React from "react"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
+import { ko } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -28,11 +29,11 @@ export function DatePicker({ date, onDateChange, placeholder }: DatePickerProps)
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>{placeholder}</span>}
+                    {date ? format(date, "PPP", { locale: ko }) : <span>{placeholder}</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" collisionPadding={10}>
-                <Calendar mode="single" selected={date} onSelect={onDateChange} initialFocus />
+                <Calendar mode="single" selected={date} onSelect={onDateChange} locale={ko} initialFocus />
             </PopoverContent>
         </Popover>
     )
