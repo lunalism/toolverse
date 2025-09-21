@@ -15,48 +15,26 @@ export default function ImageConverterPage() {
         if (!file) {
             setOriginalFile(null);
             setOriginalPreviewUrl('');
-            setHeicConversionErrorFile(null);
             return;
         }
-
+    
         const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
-        let processedFile = file;
-
+    
+        // 👇 HEIC 파일일 경우, 안내 메시지를 보여주고 함수를 종료합니다.
         if (isHeic) {
-            setLoadingMessage('HEIC 파일을 변환 중입니다 (브라우저)...');
-            setIsLoading(true);
-            try {
-                const heic2any = (await import('heic2any')).default;
-                const convertedBlob = await heic2any({
-                    blob: file,
-                    toType: "image/jpeg",
-                    quality: 0.9,
-                }) as Blob;
-                
-                const fileName = file.name.replace(/\.[^/.]+$/, ".jpg");
-                processedFile = new File([convertedBlob], fileName, { type: 'image/jpeg' });
-                
-            } catch (error) {
-                console.error("클라이언트 HEIC 변환 오류:", error);
-                setHeicConversionErrorFile(file);
-                setIsLoading(false);
-                setLoadingMessage('');
-                return;
-            } finally {
-                setIsLoading(false);
-                setLoadingMessage('');
-            }
+            alert('HEIC 변환 기능은 현재 준비 중입니다. 곧 더 강력한 모습으로 찾아뵙겠습니다!');
+            return;
         }
         
-        if (processedFile.type.startsWith('image/')) {
-            setOriginalFile(processedFile);
-            setHeicConversionErrorFile(null);
-            const previewUrl = URL.createObjectURL(processedFile);
+        // HEIC가 아닌 일반 이미지 파일 처리
+        if (file.type.startsWith('image/')) {
+            setOriginalFile(file);
+            const previewUrl = URL.createObjectURL(file);
             setOriginalPreviewUrl(previewUrl);
         } else {
             alert('이미지 파일만 업로드해주세요.');
         }
-    };
+      };
 
     const handleServerRetry = async () => {
         if (!heicConversionErrorFile) return;
