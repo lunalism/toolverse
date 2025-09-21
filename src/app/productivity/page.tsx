@@ -13,6 +13,11 @@ const tools = [
         title: "뽀모도로 타이머",
         description: "25분 집중 + 5분 휴식 사이클로 생산성을 극대화하세요. 할 일 관리, 통계 추적 기능을 제공합니다.",
     },
+    {
+        href: "/productivity/date-calculator",
+        title: "시간/날짜 계산기",
+        description: "D-day, 날짜 더하기/빼기, 업무일 계산 등 복잡한 시간 계산을 간편하게 처리합니다.",
+    },
 ];
 
 const keywords = ['focus', 'desk', 'coffee', 'study', 'relax'];
