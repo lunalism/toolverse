@@ -1,7 +1,10 @@
 "use client";
 
-import { Button } from '@/components/ui/button';
 import { useState, ChangeEvent, DragEvent, useEffect } from 'react';
+// shadcn/ui 컴포넌트들을 import 합니다.
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function ImageConverterPage() {
     const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -9,9 +12,8 @@ export default function ImageConverterPage() {
     const [targetFormat, setTargetFormat] = useState<'jpeg' | 'png' | 'webp'>('jpeg');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [loadingMessage, setLoadingMessage] = useState<string>('');
-    const [heicConversionErrorFile, setHeicConversionErrorFile] = useState<File | null>(null);
 
-    const handleFile = async (file: File | null) => {
+    const handleFile = (file: File | null) => {
         if (!file) {
             setOriginalFile(null);
             setOriginalPreviewUrl('');
@@ -20,52 +22,17 @@ export default function ImageConverterPage() {
     
         const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
     
-        // 👇 HEIC 파일일 경우, 안내 메시지를 보여주고 함수를 종료합니다.
         if (isHeic) {
             alert('HEIC 변환 기능은 현재 준비 중입니다. 곧 더 강력한 모습으로 찾아뵙겠습니다!');
             return;
         }
         
-        // HEIC가 아닌 일반 이미지 파일 처리
         if (file.type.startsWith('image/')) {
             setOriginalFile(file);
             const previewUrl = URL.createObjectURL(file);
             setOriginalPreviewUrl(previewUrl);
         } else {
             alert('이미지 파일만 업로드해주세요.');
-        }
-      };
-
-    const handleServerRetry = async () => {
-        if (!heicConversionErrorFile) return;
-
-        setLoadingMessage('서버에서 변환을 재시도합니다...');
-        setIsLoading(true);
-        setHeicConversionErrorFile(null);
-
-        const formData = new FormData();
-        formData.append('file', heicConversionErrorFile);
-
-        try {
-            const response = await fetch('/api/image/convert-heic', {
-                method: 'POST',
-                body: formData,
-            });
-            if (!response.ok) throw new Error('서버 변환 실패');
-
-            const convertedBlob = await response.blob();
-            const fileName = heicConversionErrorFile.name.replace(/\.[^/.]+$/, ".jpeg");
-            const convertedFile = new File([convertedBlob], fileName, { type: 'image/jpeg' });
-            
-            handleFile(convertedFile);
-        } catch (error) {
-            console.error('서버 HEIC 변환 오류:', error);
-            alert('서버에서도 파일 변환에 실패했습니다. 다른 파일을 이용해주세요.');
-            setOriginalFile(null);
-            setOriginalPreviewUrl('');
-        } finally {
-            setIsLoading(false);
-            setLoadingMessage('');
         }
     };
     
@@ -83,12 +50,10 @@ export default function ImageConverterPage() {
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
-
             if (!ctx) {
                 setIsLoading(false);
                 return;
             }
-
             ctx.drawImage(img, 0, 0);
             const dataUrl = canvas.toDataURL(`image/${targetFormat}`, 1.0);
             const a = document.createElement('a');
@@ -117,74 +82,61 @@ export default function ImageConverterPage() {
                 </p>
             </div>
 
-            {isLoading && (
-                <div className="text-center py-10">
-                    <p className="text-lg font-semibold">{loadingMessage || '처리 중...'}</p>
-                </div>
-            )}
-
-            {!originalFile && !isLoading && !heicConversionErrorFile && (
-                <div className="w-full max-w-2xl mx-auto" onDragOver={handleDragOver} onDrop={handleDrop}>
-                    <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <svg className="w-10 h-10 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                        </svg>
-                        <p>이미지 파일(HEIC 포함)을 드롭하거나 클릭하여 업로드하세요</p>
+            <div className="w-full max-w-2xl mx-auto">
+                {!originalFile ? (
+                    <div onDragOver={handleDragOver} onDrop={handleDrop}>
+                        <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <svg className="w-10 h-10 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                            <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">클릭하여 업로드</span> 또는 파일을 드래그 앤 드롭하세요</p>
+                            <p className="text-xs text-gray-500">이미지 파일(HEIC 포함)을 지원합니다.</p>
+                        </label>
                         <input id="file-upload" type="file" className="hidden" accept="image/*,.heic,.heif" onChange={handleFileChange} />
-                    </label>
-                </div>
-            )}
-
-            {heicConversionErrorFile && !isLoading && (
-                <div className="w-full max-w-2xl mx-auto text-center p-8 border rounded-lg bg-yellow-50 border-yellow-200">
-                    <h3 className="text-lg font-semibold text-yellow-800">브라우저에서 변환 실패</h3>
-                    <p className="text-yellow-700 my-2">이 HEIC 파일은 브라우저에서 직접 변환할 수 없는 형식입니다.</p>
-                    <p className="text-sm text-yellow-600 mb-4">파일명: {heicConversionErrorFile.name}</p>
-                    <Button onClick={handleServerRetry} className="px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg shadow-md hover:bg-yellow-600">
-                        더 강력한 서버에서 재시도
-                    </Button>
-                </div>
-            )}
-
-            {(originalFile && !isLoading && !heicConversionErrorFile) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">원본 이미지</h2>
-                        <div className="border rounded-lg p-2 bg-gray-50 flex items-center justify-center h-96">
-                            {originalPreviewUrl && (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={originalPreviewUrl} alt="Original Preview" className="max-w-full max-h-96 rounded" />
-                            )}
+                        
+                        <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r-lg">
+                            <h3 className="font-bold">HEIC 변환 기능 안내</h3>
+                            <p className="text-sm">현재 일부 HEIC 파일 변환이 불안정하여, 더 강력한 서버 로직으로 개선될 예정입니다. 일반 이미지 파일(JPG, PNG 등)은 정상적으로 작동합니다.</p>
                         </div>
                     </div>
-                
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">변환 옵션</h2>
-                        <div className="border rounded-lg p-4 bg-white space-y-4 shadow-sm">
-                            <div>
-                                <label className="text-sm font-medium">변환할 포맷</label>
-                                <div className="flex items-center gap-6 mt-2">
-                                    <label className="flex items-center">
-                                        <input type="radio" name="format" value="jpeg" checked={targetFormat === 'jpeg'} onChange={() => setTargetFormat('jpeg')} className="h-4 w-4 text-indigo-600 border-gray-300" />
-                                        <span className="ml-2">JPG</span>
-                                    </label>
-                                    <label className="flex items-center">
-                                        <input type="radio" name="format" value="png" checked={targetFormat === 'png'} onChange={() => setTargetFormat('png')} className="h-4 w-4 text-indigo-600 border-gray-300" />
-                                        <span className="ml-2">PNG</span>
-                                    </label>
-                                    <label className="flex items-center">
-                                        <input type="radio" name="format" value="webp" checked={targetFormat === 'webp'} onChange={() => setTargetFormat('webp')} className="h-4 w-4 text-indigo-600 border-gray-300" />
-                                        <span className="ml-2">WEBP</span>
-                                    </label>
-                                </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">원본 이미지</h2>
+                            <div className="border rounded-lg p-2 bg-gray-50 flex items-center justify-center h-96">
+                                {originalPreviewUrl && (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={originalPreviewUrl} alt="Original Preview" className="max-w-full max-h-96 rounded" />
+                                )}
                             </div>
-                            <Button onClick={handleConvert} disabled={isLoading} className="w-full px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400">
-                                {isLoading ? loadingMessage : '포맷 변환 & 다운로드'}
-                            </Button>
+                        </div>
+                    
+                        <div className="space-y-4">
+                            <h2 className="text-lg font-semibold">변환 옵션</h2>
+                            <div className="border rounded-lg p-6 bg-white space-y-6 shadow-sm">
+                                <RadioGroup value={targetFormat} onValueChange={(value: 'jpeg' | 'png' | 'webp') => setTargetFormat(value)}>
+                                    <Label className="text-base">변환할 포맷</Label>
+                                    <div className="flex items-center space-x-6 pt-2">
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="jpeg" id="jpeg" />
+                                            <Label htmlFor="jpeg">JPG</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="png" id="png" />
+                                            <Label htmlFor="png">PNG</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="webp" id="webp" />
+                                            <Label htmlFor="webp">WEBP</Label>
+                                        </div>
+                                    </div>
+                                </RadioGroup>
+                                <Button onClick={handleConvert} disabled={isLoading} className="w-full" size="lg">
+                                    {isLoading ? loadingMessage : '포맷 변환 & 다운로드'}
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
