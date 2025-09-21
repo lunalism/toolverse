@@ -20,16 +20,18 @@ export async function POST(request: NextRequest) {
             .jpeg({ quality: 90 }) // 90% 품질의 JPEG로 변환하라고 명령합니다.
             .toBuffer(); // 결과를 다시 Buffer 형태로 꺼냅니다.
 
+        const arrayBuffer = new Uint8Array(convertedImageBuffer).buffer;
+
         const originalFileName = file.name.replace(/\.[^/.]+$/, "");
         const filename = `${originalFileName}.jpeg`;
 
-        // 3. 변환된 이미지 데이터를 사용자에게 다시 보내줍니다.
-        return new NextResponse(convertedImageBuffer, {
-        status: 200,
-        headers: {
-            'Content-Type': 'image/jpeg',
-            'Content-Disposition': `attachment; filename="${filename}"`,
-        },
+        // 👇 변환된 arrayBuffer를 사용합니다.
+        return new NextResponse(arrayBuffer, {
+            status: 200,
+            headers: {
+                'Content-Type': 'image/jpeg',
+                'Content-Disposition': `attachment; filename="${filename}"`,
+            },
         });
 
     } catch (error) {
