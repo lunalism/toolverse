@@ -27,10 +27,15 @@ export async function POST(request: NextRequest) {
         copiedPages.forEach(page => newPdf.addPage(page));
 
         const newPdfBytes = await newPdf.save();
+
+        // 👇 이 한 줄을 추가하여 Uint8Array를 표준 ArrayBuffer로 변환합니다.
+        const arrayBuffer = new Uint8Array(newPdfBytes).buffer;
+
         const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
         const filename = `toolverse-reordered_${timestamp}.pdf`;
 
-        return new NextResponse(newPdfBytes, {
+        // 👇 변환된 arrayBuffer를 사용합니다.
+        return new NextResponse(arrayBuffer, {
             status: 200,
             headers: {
                 'Content-Type': 'application/pdf',
