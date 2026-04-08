@@ -251,21 +251,21 @@ textarea.input {
 
 /* Hero 섹션 */
 .hub-hero {
-  background: #FAFAFA;
-  padding: 36px 32px 44px;
+  background: linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 50%, #F0FDF4 100%);
+  padding: 36px 32px 56px;
   text-align: center;
 }
 
 .hub-hero-title {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 40px;
+  font-weight: 800;
   color: var(--color-text);
   margin-bottom: 12px;
-  letter-spacing: -0.02em;
+  letter-spacing: -1px;
 }
 
 .hub-hero-subtitle {
-  font-size: 15px;
+  font-size: 16px;
   color: #6B7280;
   margin-bottom: 32px;
 }
@@ -328,9 +328,10 @@ textarea.input {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 24px;
-  margin-bottom: 16px;
+  padding-top: 24px;
+  margin-bottom: 20px;
   justify-content: center;
+  border-top: 1px solid #F0F0EE;
 }
 
 .cat-pill {
@@ -363,13 +364,16 @@ textarea.input {
   color: #FFFFFF;
 }
 
-/* 툴 그리드 — 5열 */
+/* 툴 그리드 — Bento (6 columns) */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px;
   margin-top: 16px;
 }
+
+.card-normal { grid-column: span 2; }
+.card-wide   { grid-column: span 3; }
 
 /* 툴 카드 */
 .tool-card {
@@ -386,12 +390,14 @@ textarea.input {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  opacity: 0;
+  animation: fadeInUp 0.4s ease forwards;
 }
 
 .tool-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
   border-color: var(--card-color, #D8D8D6);
   text-decoration: none;
 }
@@ -401,6 +407,63 @@ textarea.input {
 .tool-card[data-category="pdf"]   { --card-color: #F59E0B; }
 .tool-card[data-category="dev"]   { --card-color: #8B5CF6; }
 .tool-card[data-category="calc"]  { --card-color: #EF4444; }
+
+/* Wide 카드 — 가로 레이아웃 */
+.card-wide {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.card-wide .tool-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.card-wide .tool-card-icon i {
+  width: 26px;
+  height: 26px;
+}
+
+.card-wide .tool-card-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-wide .tool-card-name {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.card-wide .tool-card-desc {
+  -webkit-line-clamp: 2;
+}
+
+/* Fade-in 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 아이콘 hover scale */
+.tool-card .tool-card-icon {
+  transition: transform 0.2s ease;
+}
+
+.tool-card:hover .tool-card-icon {
+  transform: scale(1.12);
+}
 
 /* 아이콘 타일 (카테고리별 컬러) */
 .tool-card-icon {
@@ -647,15 +710,36 @@ textarea.input {
 /* ============================================
    Responsive
    ============================================ */
-@media (max-width: 1280px) {
+@media (max-width: 1024px) {
   .tools-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-}
 
-@media (max-width: 1024px) {
-  .tools-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .card-normal { grid-column: span 2; }
+  .card-wide   { grid-column: span 2; }
+
+  .card-wide {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .card-wide .tool-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin: 0 auto 12px;
+  }
+
+  .card-wide .tool-card-icon i {
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-wide .tool-card-name {
+    font-size: 13px;
+    margin-bottom: 4px;
   }
 }
 
@@ -664,16 +748,17 @@ textarea.input {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .hub-header {
-    padding: 16px 20px;
+  .card-normal,
+  .card-wide {
+    grid-column: span 1;
   }
 
   .hub-hero {
-    padding: 28px 20px 36px;
+    padding: 28px 20px 40px;
   }
 
   .hub-hero-title {
-    font-size: 24px;
+    font-size: 30px;
   }
 
   .hub-main {

@@ -52,18 +52,18 @@
   <script>
     const tools = [
       { category: 'text',  icon: 'file-text',    name: '글자 수 세기',      desc: '글자, 단어, 줄 수를 즉시 확인',       url: 'tools/text/word-counter.html' },
-      { category: 'text',  icon: 'git-compare',  name: '텍스트 비교',       desc: '두 텍스트의 차이를 시각적으로 비교',   url: 'tools/text/text-diff.html' },
+      { category: 'text',  icon: 'git-compare',  name: '텍스트 비교',       desc: '두 텍스트의 차이를 시각적으로 비교',   url: 'tools/text/text-diff.html', wide: true },
       { category: 'text',  icon: 'type',         name: '대소문자 변환',     desc: '대문자, 소문자, camelCase 등 변환',    url: 'tools/text/text-case.html' },
       { category: 'text',  icon: 'list-ordered', name: '줄 정렬/중복제거',  desc: '텍스트 줄 정렬 및 중복 제거',          url: 'tools/text/text-sort.html' },
       { category: 'text',  icon: 'pencil-line',  name: '더미 텍스트',       desc: 'Lorem Ipsum / 한국어 더미 텍스트',     url: 'tools/text/lorem-ipsum.html' },
       { category: 'image', icon: 'maximize-2',   name: '이미지 리사이즈',   desc: '이미지 크기를 원하는 대로 조절',       url: 'tools/image/image-resize.html' },
-      { category: 'image', icon: 'image',        name: '이미지 포맷 변환',  desc: 'PNG, JPG, WEBP 포맷 변환',            url: 'tools/image/image-convert.html' },
+      { category: 'image', icon: 'image',        name: '이미지 포맷 변환',  desc: 'PNG, JPG, WEBP 포맷 변환',            url: 'tools/image/image-convert.html', wide: true },
       { category: 'image', icon: 'archive',      name: '이미지 압축',       desc: '화질 유지하며 용량 줄이기',            url: 'tools/image/image-compress.html' },
       { category: 'image', icon: 'crop',         name: '이미지 자르기',     desc: '원하는 영역만 간편하게 크롭',          url: 'tools/image/image-crop.html' },
       { category: 'image', icon: 'code-2',       name: '이미지 → Base64',   desc: '이미지를 Base64 문자열로 변환',        url: 'tools/image/image-to-base64.html' },
-      { category: 'pdf',   icon: 'file-output',  name: '이미지 → PDF',      desc: '이미지 여러 장을 PDF로 합치기',        url: 'tools/pdf/image-to-pdf.html' },
+      { category: 'pdf',   icon: 'file-output',  name: '이미지 → PDF',      desc: '이미지 여러 장을 PDF로 합치기',        url: 'tools/pdf/image-to-pdf.html', wide: true },
       { category: 'pdf',   icon: 'file-input',   name: 'PDF → 이미지',      desc: 'PDF 페이지를 이미지로 추출',           url: 'tools/pdf/pdf-to-image.html' },
-      { category: 'dev',   icon: 'braces',       name: 'JSON 포맷터',       desc: 'JSON 정렬, 검증, 압축',               url: 'tools/dev/json-formatter.html' },
+      { category: 'dev',   icon: 'braces',       name: 'JSON 포맷터',       desc: 'JSON 정렬, 검증, 압축',               url: 'tools/dev/json-formatter.html', wide: true },
       { category: 'dev',   icon: 'lock-keyhole', name: 'Base64 변환',       desc: '텍스트 Base64 인코딩/디코딩',          url: 'tools/dev/base64.html' },
       { category: 'dev',   icon: 'link',         name: 'URL 인코딩',        desc: 'URL 인코딩/디코딩 변환',               url: 'tools/dev/url-encode.html' },
       { category: 'dev',   icon: 'palette',      name: '색상 코드 변환',    desc: 'HEX, RGB, HSL 상호 변환',             url: 'tools/dev/color-picker.html' },
@@ -91,13 +91,15 @@
         return matchCategory && matchKeyword;
       });
 
-      grid.innerHTML = filtered.map(tool => `
-        <a href="${tool.url}" class="tool-card" data-category="${tool.category}">
+      grid.innerHTML = filtered.map((tool, i) => `
+        <a href="${tool.url}" class="tool-card ${tool.wide ? 'card-wide' : 'card-normal'}" data-category="${tool.category}" style="animation-delay: ${(i * 0.03).toFixed(2)}s">
           <div class="tool-card-icon">
             <i data-lucide="${tool.icon}"></i>
           </div>
-          <div class="tool-card-name">${tool.name}</div>
-          <div class="tool-card-desc">${tool.desc}</div>
+          <div class="tool-card-text">
+            <div class="tool-card-name">${tool.name}</div>
+            <div class="tool-card-desc">${tool.desc}</div>
+          </div>
         </a>
       `).join('');
 
