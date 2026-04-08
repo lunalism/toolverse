@@ -364,16 +364,16 @@ textarea.input {
   color: #FFFFFF;
 }
 
-/* 툴 그리드 — Bento (6 columns) */
+/* 툴 그리드 — 4 columns */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   margin-top: 16px;
 }
 
-.card-normal { grid-column: span 2; }
-.card-wide   { grid-column: span 3; }
+.card-normal { grid-column: span 1; }
+.card-wide   { grid-column: span 2; }
 
 /* 툴 카드 */
 .tool-card {
@@ -382,7 +382,7 @@ textarea.input {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 140px;
+  min-height: 130px;
   padding: 20px;
   background: #FFFFFF;
   border: 1px solid var(--notion-border);
@@ -407,42 +407,6 @@ textarea.input {
 .tool-card[data-category="pdf"]   { --card-color: #F59E0B; }
 .tool-card[data-category="dev"]   { --card-color: #8B5CF6; }
 .tool-card[data-category="calc"]  { --card-color: #EF4444; }
-
-/* Wide 카드 — 가로 레이아웃 */
-.card-wide {
-  flex-direction: row;
-  align-items: center;
-  text-align: left;
-  gap: 16px;
-  padding: 20px 24px;
-}
-
-.card-wide .tool-card-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 14px;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.card-wide .tool-card-icon i {
-  width: 26px;
-  height: 26px;
-}
-
-.card-wide .tool-card-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.card-wide .tool-card-name {
-  font-size: 15px;
-  margin-bottom: 6px;
-}
-
-.card-wide .tool-card-desc {
-  -webkit-line-clamp: 2;
-}
 
 /* Fade-in 애니메이션 */
 @keyframes fadeInUp {
@@ -712,35 +676,10 @@ textarea.input {
    ============================================ */
 @media (max-width: 1024px) {
   .tools-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .card-normal { grid-column: span 2; }
-  .card-wide   { grid-column: span 2; }
-
-  .card-wide {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-  }
-
-  .card-wide .tool-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    margin: 0 auto 12px;
-  }
-
-  .card-wide .tool-card-icon i {
-    width: 20px;
-    height: 20px;
-  }
-
-  .card-wide .tool-card-name {
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
+  .card-wide { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
