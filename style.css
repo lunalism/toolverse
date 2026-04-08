@@ -215,6 +215,7 @@ textarea.input {
 .hub-header {
   background: var(--color-bg);
   padding: 20px 32px;
+  border-bottom: 1px solid #F0F0EE;
 }
 
 .hub-header-inner {
@@ -300,7 +301,7 @@ textarea.input {
   font-family: var(--font);
   color: var(--color-text);
   background: #FFFFFF;
-  border: 1px solid var(--notion-border);
+  border: 1px solid #E5E7EB;
   border-radius: var(--radius-md);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -311,8 +312,8 @@ textarea.input {
 
 .hub-search-input:focus {
   outline: none;
-  border-color: #D0D0CE;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* Main */
@@ -327,7 +328,8 @@ textarea.input {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 32px;
+  margin-top: 24px;
+  margin-bottom: 16px;
   justify-content: center;
 }
 
@@ -361,11 +363,12 @@ textarea.input {
   color: #FFFFFF;
 }
 
-/* 툴 그리드 — 4열 */
+/* 툴 그리드 — 5열 */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
+  margin-top: 16px;
 }
 
 /* 툴 카드 */
@@ -373,7 +376,9 @@ textarea.input {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  min-height: 140px;
   padding: 20px;
   background: #FFFFFF;
   border: 1px solid var(--notion-border);
@@ -381,15 +386,21 @@ textarea.input {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .tool-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  border-color: #D8D8D6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--card-color, #D8D8D6);
   text-decoration: none;
 }
+
+.tool-card[data-category="text"]  { --card-color: #2563EB; }
+.tool-card[data-category="image"] { --card-color: #10B981; }
+.tool-card[data-category="pdf"]   { --card-color: #F59E0B; }
+.tool-card[data-category="dev"]   { --card-color: #8B5CF6; }
+.tool-card[data-category="calc"]  { --card-color: #EF4444; }
 
 /* 아이콘 타일 (카테고리별 컬러) */
 .tool-card-icon {
@@ -636,6 +647,12 @@ textarea.input {
 /* ============================================
    Responsive
    ============================================ */
+@media (max-width: 1280px) {
+  .tools-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   .tools-grid {
     grid-template-columns: repeat(3, 1fr);
