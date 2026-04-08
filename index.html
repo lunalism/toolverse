@@ -7,11 +7,13 @@
   <meta name="description" content="설치 없이 브라우저에서 바로 사용하는 무료 툴 모음. 텍스트, 이미지, PDF, 개발자, 계산기 도구.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
   <link rel="stylesheet" href="./style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header class="hub-header">
     <div class="hub-header-inner">
       <a href="./index.html" class="hub-logo">🛠️ Toolverse</a>
+      <span class="hub-badge">20 tools</span>
     </div>
   </header>
 
@@ -19,7 +21,9 @@
     <h1 class="hub-hero-title">무엇을 도와드릴까요?</h1>
     <p class="hub-hero-subtitle">20가지 무료 툴을 설치 없이 바로 사용하세요</p>
     <div class="hub-search">
-      <span class="hub-search-icon" aria-hidden="true">🔍</span>
+      <span class="hub-search-icon" aria-hidden="true">
+        <i data-lucide="search"></i>
+      </span>
       <input
         type="text"
         id="searchInput"
@@ -33,11 +37,11 @@
   <main class="hub-main">
     <nav class="category-filter" id="categoryFilter">
       <button class="cat-pill is-active" data-category="all">전체</button>
-      <button class="cat-pill" data-category="text">📝 텍스트</button>
-      <button class="cat-pill" data-category="image">🖼️ 이미지</button>
-      <button class="cat-pill" data-category="pdf">📄 PDF</button>
-      <button class="cat-pill" data-category="dev">👨‍💻 개발자</button>
-      <button class="cat-pill" data-category="calc">📐 계산기</button>
+      <button class="cat-pill" data-category="text">텍스트</button>
+      <button class="cat-pill" data-category="image">이미지</button>
+      <button class="cat-pill" data-category="pdf">PDF</button>
+      <button class="cat-pill" data-category="dev">개발자</button>
+      <button class="cat-pill" data-category="calc">계산기</button>
     </nav>
 
     <section class="tools-grid" id="toolsGrid"></section>
@@ -53,26 +57,26 @@
 
   <script>
     const tools = [
-      { category: 'text',  icon: '📝', name: '글자 수 세기',      desc: '글자, 단어, 줄 수를 즉시 확인',       url: 'tools/text/word-counter.html' },
-      { category: 'text',  icon: '🔍', name: '텍스트 비교',       desc: '두 텍스트의 차이를 시각적으로 비교',   url: 'tools/text/text-diff.html' },
-      { category: 'text',  icon: '🔤', name: '대소문자 변환',     desc: '대문자, 소문자, camelCase 등 변환',    url: 'tools/text/text-case.html' },
-      { category: 'text',  icon: '📋', name: '줄 정렬/중복제거',  desc: '텍스트 줄 정렬 및 중복 제거',          url: 'tools/text/text-sort.html' },
-      { category: 'text',  icon: '✍️', name: '더미 텍스트',       desc: 'Lorem Ipsum / 한국어 더미 텍스트',     url: 'tools/text/lorem-ipsum.html' },
-      { category: 'image', icon: '↔️', name: '이미지 리사이즈',   desc: '이미지 크기를 원하는 대로 조절',       url: 'tools/image/image-resize.html' },
-      { category: 'image', icon: '🔄', name: '이미지 포맷 변환',  desc: 'PNG, JPG, WEBP 포맷 변환',            url: 'tools/image/image-convert.html' },
-      { category: 'image', icon: '🗜️', name: '이미지 압축',       desc: '화질 유지하며 용량 줄이기',            url: 'tools/image/image-compress.html' },
-      { category: 'image', icon: '✂️', name: '이미지 자르기',     desc: '원하는 영역만 간편하게 크롭',          url: 'tools/image/image-crop.html' },
-      { category: 'image', icon: '💾', name: '이미지 → Base64',   desc: '이미지를 Base64 문자열로 변환',        url: 'tools/image/image-to-base64.html' },
-      { category: 'pdf',   icon: '📄', name: '이미지 → PDF',      desc: '이미지 여러 장을 PDF로 합치기',        url: 'tools/pdf/image-to-pdf.html' },
-      { category: 'pdf',   icon: '🖼️', name: 'PDF → 이미지',      desc: 'PDF 페이지를 이미지로 추출',           url: 'tools/pdf/pdf-to-image.html' },
-      { category: 'dev',   icon: '{}', name: 'JSON 포맷터',       desc: 'JSON 정렬, 검증, 압축',               url: 'tools/dev/json-formatter.html' },
-      { category: 'dev',   icon: '🔐', name: 'Base64 변환',       desc: '텍스트 Base64 인코딩/디코딩',          url: 'tools/dev/base64.html' },
-      { category: 'dev',   icon: '🔗', name: 'URL 인코딩',        desc: 'URL 인코딩/디코딩 변환',               url: 'tools/dev/url-encode.html' },
-      { category: 'dev',   icon: '🎨', name: '색상 코드 변환',    desc: 'HEX, RGB, HSL 상호 변환',             url: 'tools/dev/color-picker.html' },
-      { category: 'dev',   icon: '🔒', name: '해시 생성기',       desc: 'SHA-256, SHA-1, SHA-512 해시 생성',   url: 'tools/dev/hash-gen.html' },
-      { category: 'calc',  icon: '📐', name: '단위 변환기',       desc: '길이, 무게, 온도, 넓이 변환',          url: 'tools/calc/unit-converter.html' },
-      { category: 'calc',  icon: '📅', name: '날짜 계산기',       desc: 'D-day, 날짜 차이, 날짜 더하기',        url: 'tools/calc/date-calculator.html' },
-      { category: 'calc',  icon: '💰', name: '할인/세금 계산기',  desc: '할인율, 부가세, 최종 금액 계산',       url: 'tools/calc/discount-calc.html' },
+      { category: 'text',  icon: 'file-text',    name: '글자 수 세기',      desc: '글자, 단어, 줄 수를 즉시 확인',       url: 'tools/text/word-counter.html' },
+      { category: 'text',  icon: 'git-compare',  name: '텍스트 비교',       desc: '두 텍스트의 차이를 시각적으로 비교',   url: 'tools/text/text-diff.html' },
+      { category: 'text',  icon: 'type',         name: '대소문자 변환',     desc: '대문자, 소문자, camelCase 등 변환',    url: 'tools/text/text-case.html' },
+      { category: 'text',  icon: 'list-ordered', name: '줄 정렬/중복제거',  desc: '텍스트 줄 정렬 및 중복 제거',          url: 'tools/text/text-sort.html' },
+      { category: 'text',  icon: 'pencil-line',  name: '더미 텍스트',       desc: 'Lorem Ipsum / 한국어 더미 텍스트',     url: 'tools/text/lorem-ipsum.html' },
+      { category: 'image', icon: 'maximize-2',   name: '이미지 리사이즈',   desc: '이미지 크기를 원하는 대로 조절',       url: 'tools/image/image-resize.html' },
+      { category: 'image', icon: 'image',        name: '이미지 포맷 변환',  desc: 'PNG, JPG, WEBP 포맷 변환',            url: 'tools/image/image-convert.html' },
+      { category: 'image', icon: 'archive',      name: '이미지 압축',       desc: '화질 유지하며 용량 줄이기',            url: 'tools/image/image-compress.html' },
+      { category: 'image', icon: 'crop',         name: '이미지 자르기',     desc: '원하는 영역만 간편하게 크롭',          url: 'tools/image/image-crop.html' },
+      { category: 'image', icon: 'code-2',       name: '이미지 → Base64',   desc: '이미지를 Base64 문자열로 변환',        url: 'tools/image/image-to-base64.html' },
+      { category: 'pdf',   icon: 'file-output',  name: '이미지 → PDF',      desc: '이미지 여러 장을 PDF로 합치기',        url: 'tools/pdf/image-to-pdf.html' },
+      { category: 'pdf',   icon: 'file-input',   name: 'PDF → 이미지',      desc: 'PDF 페이지를 이미지로 추출',           url: 'tools/pdf/pdf-to-image.html' },
+      { category: 'dev',   icon: 'braces',       name: 'JSON 포맷터',       desc: 'JSON 정렬, 검증, 압축',               url: 'tools/dev/json-formatter.html' },
+      { category: 'dev',   icon: 'lock-keyhole', name: 'Base64 변환',       desc: '텍스트 Base64 인코딩/디코딩',          url: 'tools/dev/base64.html' },
+      { category: 'dev',   icon: 'link',         name: 'URL 인코딩',        desc: 'URL 인코딩/디코딩 변환',               url: 'tools/dev/url-encode.html' },
+      { category: 'dev',   icon: 'palette',      name: '색상 코드 변환',    desc: 'HEX, RGB, HSL 상호 변환',             url: 'tools/dev/color-picker.html' },
+      { category: 'dev',   icon: 'shield-check', name: '해시 생성기',       desc: 'SHA-256, SHA-1, SHA-512 해시 생성',   url: 'tools/dev/hash-gen.html' },
+      { category: 'calc',  icon: 'ruler',        name: '단위 변환기',       desc: '길이, 무게, 온도, 넓이 변환',          url: 'tools/calc/unit-converter.html' },
+      { category: 'calc',  icon: 'calendar',     name: '날짜 계산기',       desc: 'D-day, 날짜 차이, 날짜 더하기',        url: 'tools/calc/date-calculator.html' },
+      { category: 'calc',  icon: 'calculator',   name: '할인/세금 계산기',  desc: '할인율, 부가세, 최종 금액 계산',       url: 'tools/calc/discount-calc.html' },
     ];
 
     const grid = document.getElementById('toolsGrid');
@@ -95,16 +99,17 @@
 
       grid.innerHTML = filtered.map(tool => `
         <a href="${tool.url}" class="tool-card" data-category="${tool.category}">
-          <div class="tool-card-bar"></div>
-          <div class="tool-card-body">
-            <div class="tool-card-icon">${tool.icon}</div>
-            <div class="tool-card-name">${tool.name}</div>
-            <div class="tool-card-desc">${tool.desc}</div>
+          <div class="tool-card-icon">
+            <i data-lucide="${tool.icon}"></i>
           </div>
+          <div class="tool-card-name">${tool.name}</div>
+          <div class="tool-card-desc">${tool.desc}</div>
         </a>
       `).join('');
 
       emptyMessage.style.display = filtered.length === 0 ? 'block' : 'none';
+
+      if (window.lucide) lucide.createIcons();
     }
 
     searchInput.addEventListener('input', (e) => {

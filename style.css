@@ -206,8 +206,8 @@ textarea.input {
   --cat-pdf: #F59E0B;
   --cat-dev: #8B5CF6;
   --cat-calc: #EF4444;
-  --notion-bg: #F7F7F5;
-  --notion-bg-hover: #F0F0EE;
+  --notion-bg: #FAFAFA;
+  --notion-bg-hover: #F4F4F4;
   --notion-border: #EBEBEA;
 }
 
@@ -222,7 +222,7 @@ textarea.input {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .hub-logo {
@@ -237,15 +237,26 @@ textarea.input {
   text-decoration: none;
 }
 
+.hub-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6B7280;
+  background: #F4F4F4;
+  border-radius: 999px;
+}
+
 /* Hero 섹션 */
 .hub-hero {
-  background: var(--notion-bg);
-  padding: 64px 32px 72px;
+  background: #FAFAFA;
+  padding: 36px 32px 44px;
   text-align: center;
 }
 
 .hub-hero-title {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 12px;
@@ -270,9 +281,16 @@ textarea.input {
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  opacity: 0.5;
+  color: #9CA3AF;
+}
+
+.hub-search-icon i {
+  width: 16px;
+  height: 16px;
 }
 
 .hub-search-input {
@@ -314,11 +332,11 @@ textarea.input {
 }
 
 .cat-pill {
-  padding: 8px 16px;
+  padding: 6px 14px;
   font-size: 13px;
   font-weight: 500;
   font-family: var(--font);
-  background: var(--notion-bg-hover);
+  background: #F4F4F4;
   color: #6B7280;
   border: none;
   border-radius: 999px;
@@ -328,13 +346,14 @@ textarea.input {
 }
 
 .cat-pill:hover {
-  background: #E5E5E3;
+  background: #ECECEC;
   color: var(--color-text);
 }
 
 .cat-pill.is-active {
   background: #1A1A1A;
   color: #FFFFFF;
+  font-weight: 500;
 }
 
 .cat-pill.is-active:hover {
@@ -353,13 +372,15 @@ textarea.input {
 .tool-card {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
   background: #FFFFFF;
   border: 1px solid var(--notion-border);
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  overflow: hidden;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -370,35 +391,32 @@ textarea.input {
   text-decoration: none;
 }
 
-/* 카테고리 컬러 띠 */
-.tool-card-bar {
-  height: 4px;
-  width: 100%;
-  background: var(--color-border);
-}
-
-.tool-card[data-category="text"]  .tool-card-bar { background: var(--cat-text); }
-.tool-card[data-category="image"] .tool-card-bar { background: var(--cat-image); }
-.tool-card[data-category="pdf"]   .tool-card-bar { background: var(--cat-pdf); }
-.tool-card[data-category="dev"]   .tool-card-bar { background: var(--cat-dev); }
-.tool-card[data-category="calc"]  .tool-card-bar { background: var(--cat-calc); }
-
-.tool-card-body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
+/* 아이콘 타일 (카테고리별 컬러) */
 .tool-card-icon {
-  font-size: 28px;
-  line-height: 1;
-  margin-bottom: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  background: #F4F4F4;
+  color: #6B7280;
 }
+
+.tool-card-icon i {
+  width: 20px;
+  height: 20px;
+}
+
+.tool-card[data-category="text"]  .tool-card-icon { background: #EFF6FF; color: #2563EB; }
+.tool-card[data-category="image"] .tool-card-icon { background: #F0FDF4; color: #10B981; }
+.tool-card[data-category="pdf"]   .tool-card-icon { background: #FFFBEB; color: #F59E0B; }
+.tool-card[data-category="dev"]   .tool-card-icon { background: #F5F3FF; color: #8B5CF6; }
+.tool-card[data-category="calc"]  .tool-card-icon { background: #FFF1F2; color: #EF4444; }
 
 .tool-card-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 4px;
@@ -423,7 +441,7 @@ textarea.input {
 }
 
 .hub-footer {
-  background: var(--notion-bg);
+  background: #FAFAFA;
   padding: 24px 32px;
   text-align: center;
   margin-top: 48px;
@@ -634,11 +652,11 @@ textarea.input {
   }
 
   .hub-hero {
-    padding: 48px 20px 56px;
+    padding: 28px 20px 36px;
   }
 
   .hub-hero-title {
-    font-size: 26px;
+    font-size: 24px;
   }
 
   .hub-main {
