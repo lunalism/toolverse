@@ -15,40 +15,40 @@
     </div>
   </header>
 
-  <main class="hub-main">
-    <section class="hub-intro mb-24" style="text-align: center;">
-      <p class="text-secondary mb-16">설치 없이 브라우저에서 바로 사용하는 무료 툴 모음</p>
-      <div class="hub-search">
-        <input
-          type="text"
-          id="searchInput"
-          class="input"
-          placeholder="툴 검색..."
-          autocomplete="off"
-        >
-      </div>
-    </section>
+  <section class="hub-hero">
+    <h1 class="hub-hero-title">무엇을 도와드릴까요?</h1>
+    <p class="hub-hero-subtitle">20가지 무료 툴을 설치 없이 바로 사용하세요</p>
+    <div class="hub-search">
+      <span class="hub-search-icon" aria-hidden="true">🔍</span>
+      <input
+        type="text"
+        id="searchInput"
+        class="hub-search-input"
+        placeholder="툴 검색..."
+        autocomplete="off"
+      >
+    </div>
+  </section>
 
+  <main class="hub-main">
     <nav class="category-filter" id="categoryFilter">
-      <button class="btn btn-primary" data-category="all">전체</button>
-      <button class="btn btn-secondary" data-category="text">📝 텍스트</button>
-      <button class="btn btn-secondary" data-category="image">🖼️ 이미지</button>
-      <button class="btn btn-secondary" data-category="pdf">📄 PDF</button>
-      <button class="btn btn-secondary" data-category="dev">👨‍💻 개발자</button>
-      <button class="btn btn-secondary" data-category="calc">📐 계산기</button>
+      <button class="cat-pill is-active" data-category="all">전체</button>
+      <button class="cat-pill" data-category="text">📝 텍스트</button>
+      <button class="cat-pill" data-category="image">🖼️ 이미지</button>
+      <button class="cat-pill" data-category="pdf">📄 PDF</button>
+      <button class="cat-pill" data-category="dev">👨‍💻 개발자</button>
+      <button class="cat-pill" data-category="calc">📐 계산기</button>
     </nav>
 
     <section class="tools-grid" id="toolsGrid"></section>
 
-    <p id="emptyMessage" class="text-secondary mt-24" style="display: none; text-align: center;">
+    <p id="emptyMessage" class="empty-message" style="display: none;">
       검색 결과가 없습니다
     </p>
   </main>
 
-  <footer style="border-top: 1px solid var(--color-border); padding: 24px; margin-top: 48px; text-align: center;">
-    <p class="text-sm text-secondary">
-      🔒 모든 파일 처리는 브라우저에서만 이루어집니다. 서버로 업로드되지 않습니다.
-    </p>
+  <footer class="hub-footer">
+    <p>🔒 모든 처리는 브라우저 내에서만 이루어집니다</p>
   </footer>
 
   <script>
@@ -94,10 +94,13 @@
       });
 
       grid.innerHTML = filtered.map(tool => `
-        <a href="${tool.url}" class="tool-card">
-          <div class="tool-card-icon">${tool.icon}</div>
-          <div class="tool-card-name">${tool.name}</div>
-          <div class="tool-card-desc">${tool.desc}</div>
+        <a href="${tool.url}" class="tool-card" data-category="${tool.category}">
+          <div class="tool-card-bar"></div>
+          <div class="tool-card-body">
+            <div class="tool-card-icon">${tool.icon}</div>
+            <div class="tool-card-name">${tool.name}</div>
+            <div class="tool-card-desc">${tool.desc}</div>
+          </div>
         </a>
       `).join('');
 
@@ -115,8 +118,7 @@
       currentCategory = btn.dataset.category;
 
       categoryFilter.querySelectorAll('button').forEach(b => {
-        b.classList.toggle('btn-primary', b === btn);
-        b.classList.toggle('btn-secondary', b !== btn);
+        b.classList.toggle('is-active', b === btn);
       });
 
       render();
